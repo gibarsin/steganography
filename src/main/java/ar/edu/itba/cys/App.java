@@ -88,6 +88,9 @@ public final class App
         // Check if the file obtained has a BMP header
         System.out.println("isBMP? " + BMPUtils.isBMPFile(image));
 
+        // Get the bitmap offset
+        System.out.println("Bitmap offest = " + BMPUtils.getBitmapOffset(image));
+
         // Save and recover seed (For testing purposes)
         System.out.println("Seed to save = " + (int) PermutationTable.getSEED());
         BMPUtils.saveSeed(image, PermutationTable.getSEED());
