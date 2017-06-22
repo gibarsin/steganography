@@ -89,12 +89,26 @@ public final class App
         System.out.println("isBMP? " + BMPUtils.isBMPFile(image));
 
         // Get the bitmap offset
-        System.out.println("Bitmap offest = " + BMPUtils.getBitmapOffset(image));
+        final int bitmapOffset = BMPUtils.getBitmapOffset(image);
+        System.out.println("Bitmap offset = " + bitmapOffset);
+
+        // Get the resolution in pixel units
+        System.out.println("Horizontal resolution in pixels = " + BMPUtils.getHorizontalWidthInPixels(image));
+        System.out.println("Vertical resolution in pixels = " + BMPUtils.getVerticalWidthInPixels(image));
+
+        // Get the bits per pixel
+        System.out.println("Bits per pixel = " + BMPUtils.getBitsPerPixel(image));
 
         // Save and recover seed (For testing purposes)
-        System.out.println("Seed to save = " + (int) PermutationTable.getSEED());
+        System.out.println("Seed to save in image = " + (int) PermutationTable.getSEED());
         BMPUtils.saveSeed(image, PermutationTable.getSEED());
         System.out.println("Seed recovered from image = " + (int) BMPUtils.recoverSeed(image));
+
+        // Hide value
+        final byte valueToHide = (byte) 0xD1;
+        System.out.printf("Value to hide = %02X\n", valueToHide);
+        BMPUtils.putValueInLSB(image, valueToHide, bitmapOffset);
+        System.out.printf("Hidden value recovered = %02X \n",  BMPUtils.getValueInLSB(image, bitmapOffset));
     }
 
     private static void recoverSecretImage(final String[] args) {
