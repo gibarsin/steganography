@@ -1,4 +1,4 @@
-package ar.edu.itba.cys;
+package ar.edu.itba.cryptography;
 
 import java.util.Random;
 

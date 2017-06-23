@@ -1,11 +1,11 @@
-package ar.edu.itba.cys;
+package ar.edu.itba.cryptography;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static ar.edu.itba.cys.App.EXIT_CODE.*;
+import static ar.edu.itba.cryptography.App.EXIT_CODE.*;
 
 
 public final class App

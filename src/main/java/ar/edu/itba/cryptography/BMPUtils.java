@@ -1,6 +1,6 @@
-package ar.edu.itba.cys;
+package ar.edu.itba.cryptography;
 
-import static ar.edu.itba.cys.BMPUtils.BMP_OFFSET.*;
+import static ar.edu.itba.cryptography.BMPUtils.BMP_OFFSET.*;
 
 /**
  * Reference: http://www.fileformat.info/format/bmp/corion.htm

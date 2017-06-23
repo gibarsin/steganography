@@ -5,33 +5,118 @@
   <groupId>ar.edu.itba.cys</groupId>
   <artifactId>steganography</artifactId>
   <version>1.0</version>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <packaging>jar</packaging>
+  <packaging>jar</packaging>
 
   <name>steganography</name>
   <url>http://maven.apache.org</url>
 
   <properties>
+    <jar.name>steganography</jar.name>
+    <mainClass>ar.edu.itba.cryptography.Main</mainClass>
+    <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+    <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
+    <maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
+    <org.slf4j.version>1.7.21</org.slf4j.version>
+    <ch.qos.logback.version>1.1.7</ch.qos.logback.version>
+    <org.logback.extensions.version>0.1.4</org.logback.extensions.version>
   </properties>
 
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven-assembly-plugin.version}</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>${mainClass}</mainClass>
+            </manifest>
+          </archive>
+          <!-- Rename .jar file and disable the append of 'jar-with-dependencies -->
+          <finalName>${jar.name}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <!-- / -->
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- bind to the packaging phase -->
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven-jar-plugin.version}</version>
+        <configuration>
+          <excludes>
+            <packagingExcludes>**/logback-test.xml</packagingExcludes>
+          </excludes>
+          <archive>
+            <manifest>
+              <mainClass>${mainClass}</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+          <!-- Prevents an endPosTable exception during compilation => for Immutables -->
+          <useIncrementalCompilation>false</useIncrementalCompilation>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <!-- Name the jar file. -->
+    <!--Default: -->
+    <!-- <finalName>${project.artifactId}-${project.version}</finalName> -->
+    <finalName>${jar.name}-without-dependencies</finalName>
+  </build>
+
   <dependencies>
+    <!--Logging-->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${org.slf4j.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>${org.slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${ch.qos.logback.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${ch.qos.logback.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.logback-extensions</groupId>
+      <artifactId>logback-ext-spring</artifactId>
+      <version>${org.logback.extensions.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!--/Logging-->
   </dependencies>
 </project>
