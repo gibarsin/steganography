@@ -12,7 +12,7 @@ public class HelpProgram implements MainProgram {
       "Skyscraper Game Solver.\n" +
           "Arguments: \n" +
           "* -h : `help` that prints all available commands" + NL +
-          "* " + D_METHOD.getName() + " : " + D_SECRET.getName() + " " + D_K.getName() + " " +
+          "* " + D_METHOD.getName() + " " + D_SECRET.getName() + " " + D_K.getName() + " " +
           D_N.getName() + " " + D_IMAGES_DIR.getName() + NL +
           "     distributes a secret image into other images." + NL +
           "     - " + D_SECRET.getName() + ": the path to the secret image to be hidden." + NL +
@@ -24,7 +24,7 @@ public class HelpProgram implements MainProgram {
           "     - " + D_IMAGES_DIR.getName() + ": OPTIONAL: the directory of the images " + NL +
           "       to be used as shadows. If not specified, the program will look those " + NL +
           "       images in the current working directory." + NL +
-          "* " + R_METHOD.getName() + " : " + R_SECRET.getName() + " " + R_K.getName() + " "
+          "* " + R_METHOD.getName() + " " + R_SECRET.getName() + " " + R_K.getName() + " "
           + R_IMAGES_DIR.getName() + NL +
           "     retrieves a secret image from shadow images." + NL +
           "     - " + R_SECRET.getName() + ": the path where the revealed secret image " + NL +
