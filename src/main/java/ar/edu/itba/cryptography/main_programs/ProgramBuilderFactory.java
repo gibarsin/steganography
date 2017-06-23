@@ -5,7 +5,7 @@ import ar.edu.itba.cryptography.main_programs.programs.DistributionProgram;
 import ar.edu.itba.cryptography.main_programs.programs.HelpProgram;
 import ar.edu.itba.cryptography.main_programs.programs.RetrieveProgram;
 
-public abstract class ProgramFactory {
+public abstract class ProgramBuilderFactory {
   /*
    * For each method, when `MainProgramBuilder.build` is called,
    * it returns an instance of the specified program

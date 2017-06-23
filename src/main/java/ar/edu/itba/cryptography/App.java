@@ -1,5 +1,6 @@
 package ar.edu.itba.cryptography;
 
+import ar.edu.itba.cryptography.services.IOService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,6 +89,9 @@ public final class App
         // Check if the file obtained has a BMP header
         System.out.println("isBMP? " + BMPUtils.isBMPFile(image));
 
+        // Get the bitmap size
+        System.out.println("Bitmap size =  " + BMPUtils.getBitmapSize(image));
+
         // Get the bitmap offset
         final int bitmapOffset = BMPUtils.getBitmapOffset(image);
         System.out.println("Bitmap offset = " + bitmapOffset);
@@ -109,9 +113,27 @@ public final class App
         System.out.printf("Value to hide = %02X\n", valueToHide);
         BMPUtils.putValueInLSB(image, valueToHide, bitmapOffset);
         System.out.printf("Hidden value recovered = %02X \n",  BMPUtils.getValueInLSB(image, bitmapOffset));
+
+        // Print to file
+      final String s = hexaBytesString(image, bitmapOffset);
+        System.out.print(s);
+      final Path newFilePath = IOService.createOutputFile("images/outputs", "copied_secret", ".bmp");
+      IOService.appendToFile(newFilePath, s);
+      IOService.closeOutputFile(newFilePath);
     }
 
-    private static void recoverSecretImage(final String[] args) {
+  private static String hexaBytesString(final byte[] file, final int bitmapOffset) {
+      final StringBuilder sb = new StringBuilder();
+    System.out.println("file length: " + file.length);
+    for(int i = bitmapOffset; i < file.length; i++) {
+      sb.append(String.format("%02X", file[i]));
+    }
+    final String s = sb.toString();
+    System.out.println("String length: " + s.length());
+    return s;
+  }
+
+  private static void recoverSecretImage(final String[] args) {
         if(!args[1].equals("-secret")) {
             exit(EXIT_CODE.BAD_ARGUMENT);
         }
@@ -176,4 +198,16 @@ public final class App
             System.out.println(i + "\t" + String.format("%02X", file[i]));
         }
     }
+
+  /**
+   * Prints file in a table manner in which the first column is the position and the second column is the value
+   * in that position.
+   *
+   * @param file the file to printInHexFormat
+   */
+  private static void printFileFrom(final byte[] file, final int offset) {
+    for(int i = offset; i < file.length; i++) {
+      System.out.print(String.format("%02X", file[i]));
+    }
+  }
 }
