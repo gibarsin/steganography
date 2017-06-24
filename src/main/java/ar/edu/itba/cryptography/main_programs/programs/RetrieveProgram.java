@@ -25,7 +25,22 @@ public class RetrieveProgram implements MainProgram {
   @Override
   public void run() {
     // TODO: DOING
-    pathsToShadows.forEach(System.out::println);
+    // if k == 8 run one algorithm
+    // else, run other algorithm
+
+    // For now, implementing the case k == 8
+
+    // get the header of any image => it will be used as the header of the retrieved message
+    // get the total bytes to retrieve (size - offset)
+    // for each byte to retrieve
+    //  for each shadow i file
+    //    get byte = p(i) joining, from the first to the last byte of the range, the last bit of each byte in the range
+    //  solve the equation system using the Gauss method => this is the byte of the current iteration
+    //
+    // write the output retrieved secret (header + data) into the pathToOutputVariable
+    // close the pathToOutputVariable
+    // [print some "Done" info]
+    // That's it! :D
   }
 
   public static MainProgram build(final Map<InputArgs, String> parsedArgs) {
