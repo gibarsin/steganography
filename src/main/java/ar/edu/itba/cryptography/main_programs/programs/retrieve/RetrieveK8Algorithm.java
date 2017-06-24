@@ -3,11 +3,15 @@ package ar.edu.itba.cryptography.main_programs.programs.retrieve;
 import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.INPUT;
 
 import ar.edu.itba.cryptography.helpers.BitHelper;
+import ar.edu.itba.cryptography.helpers.GaussSolverHelper;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
 import java.nio.file.Path;
 import java.util.List;
 
+// IMPORTANT
+//   Care must be taken between conversions of int and byte types.
+//   Use BitHelper.byteToUnsignedInt when needed
 public class RetrieveK8Algorithm implements RetrieveAlgorithm {
   private static final int FIRST_ELEM_INDEX = 0;
 
@@ -21,9 +25,9 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
   @Override
   public byte[] retrieveData(final BMPIOService bmpIOService,
       // TODO: we are assuming that only k shadowsPaths are given
-      final List<Path> shadowsPaths, final int dataLength, final int modulus) { // TODO
+      final List<Path> shadowsPaths, final int dataLength, final int modulus) {
     final int k = shadowsPaths.size();
-    final byte[][] matrix = initializeMatrix(bmpIOService, shadowsPaths, k, modulus);
+    final int[][] matrix = initializeMatrix(bmpIOService, shadowsPaths, k, modulus);
     final byte[] data = new byte[dataLength];
     // For each group of k bytes to retrieve
     for (int i = 0 ; i < dataLength ; i += k) {
@@ -31,7 +35,8 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
       for (final Path shadowPath : shadowsPaths) {
         final int shadowNumber = bmpIOService.getPathMatrixRow(shadowPath, INPUT);
         // Get byte = p(shadowNumber) (recall that this byte is hidden among several shadow's bytes)
-        matrix[shadowNumber][k] = bmpIOService.getNextSecretByte(shadowPath, INPUT);
+        final byte b = bmpIOService.getNextSecretByte(shadowPath, INPUT);
+        matrix[shadowNumber][k] = BitHelper.byteToUnsignedInt(b);
       }
       // Solve the equation system to get the k chunk bytes of current iteration
       final byte[] kDataByteChunk = solveEquationSystem(matrix, modulus);
@@ -49,8 +54,13 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
    * @param n the modulus to be used for arithmetic operations
    * @return the x array solution of the equation system Ax = b
    */
-  private byte[] solveEquationSystem(final byte[][] matrix, final int n) {
-    return new byte[0]; // TODO
+  private byte[] solveEquationSystem(final int[][] matrix, final int n) {
+    final int[] x = GaussSolverHelper.solve(matrix, n);
+    final byte[] xAsBytes = new byte[x.length];
+    for (int i = 0 ; i < x.length ; i++) {
+      xAsBytes[i] = BitHelper.intToByte(x[i]);
+    }
+    return xAsBytes;
   }
 
   /**
@@ -70,15 +80,15 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
    * @param modulus the modulus operation to be used during the equation solving problem
    * @return the constructed matrix = A | b
    */
-  private byte[][] initializeMatrix(final BMPIOService bmpIOService, final List<Path> shadowsPaths,
+  private int[][] initializeMatrix(final BMPIOService bmpIOService, final List<Path> shadowsPaths,
       final int k, final int modulus) {
-    final byte[][] matrix = new byte[k][k+1];
+    final int[][] matrix = new int[k][k+1];
     for (int row = 0 ; row < k ; row ++) {
       final Path path = shadowsPaths.get(row);
       bmpIOService.setPathMatrixRow(path, INPUT, row);
       final int x = bmpIOService.getShadowNumber(path, INPUT);
       for (int col = 0 ; col < k ; col ++) {
-        matrix[row][col] = calculateMatrixXTerm(x, k, col, modulus);
+        matrix[row][col] = BitHelper.byteToUnsignedInt(calculateMatrixXTerm(x, k, col, modulus));
       }
     }
     return matrix;
