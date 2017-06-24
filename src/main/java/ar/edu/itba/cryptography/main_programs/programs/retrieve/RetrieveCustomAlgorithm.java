@@ -6,9 +6,13 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class RetrieveCustomAlgorithm implements RetrieveAlgorithm {
-
   @Override
-  public byte[] retrieveHeader(final BMPIOService bmpIOService,
+  public String run(final BMPIOService bmpIOService, final List<Path> shadowsPaths,
+      final int modulus) {
+    return null;
+  }
+
+  private byte[] retrieveHeader(final BMPIOService bmpIOService,
       final List<Path> shadowsPaths) {
     // TODO: we will initially retrieve 54 bytes for the header =>
     // TODO: => keep adding bytes to header until offset-1 is the length of the header (in bytes).
@@ -16,8 +20,7 @@ public class RetrieveCustomAlgorithm implements RetrieveAlgorithm {
     return new byte[0]; // TODO
   }
 
-  @Override
-  public byte[] retrieveData(final BMPIOService bmpIOService,
+  private byte[] retrieveData(final BMPIOService bmpIOService,
       final List<Path> shadowsPaths, final int dataLength) {
     return new byte[0]; // TODO
   }
