@@ -1,11 +1,11 @@
-package ar.edu.itba.cryptography;
+package ar.edu.itba.cryptography.services;
 
-import static ar.edu.itba.cryptography.BMPUtils.BMP_OFFSET.*;
+import static ar.edu.itba.cryptography.services.BMPService.BMP_OFFSET.*;
 
 /**
  * Reference: http://www.fileformat.info/format/bmp/corion.htm
  */
-final class BMPUtils {
+public final class BMPService {
 
   private static final int BMP_ID = 0x4D42;
 
@@ -42,36 +42,36 @@ final class BMPUtils {
     }
   }
 
-  static boolean isBMPFile(final byte[] image) {
+  public static boolean isBMPFile(final byte[] image) {
     // 0x4D42 represent BM backwards because of the way the value is retrieved
     return getValue(image, ID, BYTES.WORD) == BMP_ID;
   }
 
-  static int getBitmapSize(final byte[] image) {
+  public static int getBitmapSize(final byte[] image) {
     return getValue(image, SIZE, BYTES.DWORD);
   }
 
-  static int getBitmapOffset(final byte[] image) {
+  public static int getBitmapOffset(final byte[] image) {
     return getValue(image, BITMAP_OFFSET, BYTES.DWORD);
   }
 
-  static int getHorizontalWidthInPixels(final byte[] image) {
+  public static int getHorizontalWidthInPixels(final byte[] image) {
     return getValue(image, HOR_WIDTH_PIXELS, BYTES.DWORD);
   }
 
-  static int getVerticalWidthInPixels(final byte[] image) {
+  public static int getVerticalWidthInPixels(final byte[] image) {
     return getValue(image, VER_WIDTH_PIXELS, BYTES.DWORD);
   }
 
-  static int getBitsPerPixel(final byte[] image) {
+  public static int getBitsPerPixel(final byte[] image) {
     return getValue(image, BITS_PER_PIXEL, BYTES.DWORD);
   }
 
-  static void saveSeed(final byte[] image, final char seed) {
+  public static void saveSeed(final byte[] image, final char seed) {
     putValue(image, seed, BMP_OFFSET.RESERVED, BYTES.WORD);
   }
 
-  static char recoverSeed(final byte[] image) {
+  public static char recoverSeed(final byte[] image) {
     return (char) getValue(image, BMP_OFFSET.RESERVED, BYTES.WORD);
   }
 

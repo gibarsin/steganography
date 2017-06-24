@@ -226,7 +226,7 @@ public class IOService {
    *
    * @param pathToFile path to the file where data is going to be written
    * @param data data to be written in file
-   * @return true if data could be appended; false otherwise
+   * @return true if data could be appended; false otherwise (and error is logged)
    */
   public static boolean appendToFile(final Path pathToFile, final String data) {
     return writeFile(pathToFile, data);

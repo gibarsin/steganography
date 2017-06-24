@@ -1,9 +1,13 @@
 package ar.edu.itba.cryptography.main_programs.programs;
 
-import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.*;
+import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.IMAGES_DIR;
+import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.K;
+import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.N;
+import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.SECRET;
 
 import ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs;
 import ar.edu.itba.cryptography.interfaces.MainProgram;
+import ar.edu.itba.cryptography.services.BMPService;
 import ar.edu.itba.cryptography.services.IOService;
 import ar.edu.itba.cryptography.services.IOService.ExitStatus;
 import java.nio.file.Path;
@@ -11,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 public class RetrieveProgram implements MainProgram {
+  private static final String HEXADECIMAL_FORMAT = "%02X";
+  private static final int STANDARD_K_VALUE = 8;
+
   private final Path pathToOutput;
   private final int k;
   private final List<Path> pathsToShadows;
@@ -24,23 +31,49 @@ public class RetrieveProgram implements MainProgram {
 
   @Override
   public void run() {
-    // TODO: DOING
-    // if k == 8 run one algorithm
-    // else, run other algorithm
+    if (this.k == STANDARD_K_VALUE) {
+      runStandardRetrieveAlgorithm();
+    } else {
+//      runCustomRetrieveAlgorithm(); // TODO
+    }
+  }
 
-    // For now, implementing the case k == 8
-
+  private void runStandardRetrieveAlgorithm() { // TODO: DOING
     // get the header of any image => it will be used as the header of the retrieved message
+    final byte[] header = getHeader();
     // get the total bytes to retrieve (size - offset)
+    final int size = BMPService.getBitmapSize(header);
+    final int offset = BMPService.getBitmapOffset(header);
+    final int dataBytes = size - offset;
+    // TODO: in k != 8, header.length will initially be 54 bytes => keep adding bytes to header
+    // TODO:   until offset-1 is the length of the header (in bytes). The remaining data will be the data
+    final byte[] data = getData(dataBytes);
+    // write the retrieved secret (header + data) into the specified pathToOutput
+    final StringBuilder bmpFileString = hexadecimalBytesToString(header);
+    bmpFileString.append(hexadecimalBytesToString(data));
+    IOService.appendToFile(this.pathToOutput, bmpFileString.toString());
+    // close the pathToOutput file
+    IOService.closeOutputFile(this.pathToOutput);
+  }
+
+  private byte[] getHeader() {
+    return new byte[0]; // TODO
+  }
+
+  private StringBuilder hexadecimalBytesToString(final byte[] bytes) {
+    final StringBuilder sb = new StringBuilder();
+    for (byte aByte : bytes) {
+      sb.append(String.format(HEXADECIMAL_FORMAT, aByte));
+    }
+    return sb;
+  }
+
+  private byte[] getData(final int dataBytes) { // TODO
     // for each byte to retrieve
     //  for each shadow i file
     //    get byte = p(i) joining, from the first to the last byte of the range, the last bit of each byte in the range
     //  solve the equation system using the Gauss method => this is the byte of the current iteration
-    //
-    // write the output retrieved secret (header + data) into the pathToOutputVariable
-    // close the pathToOutputVariable
-    // [print some "Done" info]
-    // That's it! :D
+    return new byte[0];
   }
 
   public static MainProgram build(final Map<InputArgs, String> parsedArgs) {

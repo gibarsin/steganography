@@ -1,5 +1,6 @@
 package ar.edu.itba.cryptography;
 
+import ar.edu.itba.cryptography.services.BMPService;
 import ar.edu.itba.cryptography.services.IOService;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -87,32 +88,33 @@ public final class App
         }
 
         // Check if the file obtained has a BMP header
-        System.out.println("isBMP? " + BMPUtils.isBMPFile(image));
+        System.out.println("isBMP? " + BMPService.isBMPFile(image));
 
         // Get the bitmap size
-        System.out.println("Bitmap size =  " + BMPUtils.getBitmapSize(image));
+        System.out.println("Bitmap size =  " + BMPService.getBitmapSize(image));
 
         // Get the bitmap offset
-        final int bitmapOffset = BMPUtils.getBitmapOffset(image);
+        final int bitmapOffset = BMPService.getBitmapOffset(image);
         System.out.println("Bitmap offset = " + bitmapOffset);
 
         // Get the resolution in pixel units
-        System.out.println("Horizontal resolution in pixels = " + BMPUtils.getHorizontalWidthInPixels(image));
-        System.out.println("Vertical resolution in pixels = " + BMPUtils.getVerticalWidthInPixels(image));
+        System.out.println("Horizontal resolution in pixels = " + BMPService.getHorizontalWidthInPixels(image));
+        System.out.println("Vertical resolution in pixels = " + BMPService.getVerticalWidthInPixels(image));
 
         // Get the bits per pixel
-        System.out.println("Bits per pixel = " + BMPUtils.getBitsPerPixel(image));
+        System.out.println("Bits per pixel = " + BMPService.getBitsPerPixel(image));
 
         // Save and recover seed (For testing purposes)
         System.out.println("Seed to save in image = " + (int) PermutationTable.getSEED());
-        BMPUtils.saveSeed(image, PermutationTable.getSEED());
-        System.out.println("Seed recovered from image = " + (int) BMPUtils.recoverSeed(image));
+        BMPService.saveSeed(image, PermutationTable.getSEED());
+        System.out.println("Seed recovered from image = " + (int) BMPService.recoverSeed(image));
 
         // Hide value
         final byte valueToHide = (byte) 0xD1;
         System.out.printf("Value to hide = %02X\n", valueToHide);
-        BMPUtils.putValueInLSB(image, valueToHide, bitmapOffset);
-        System.out.printf("Hidden value recovered = %02X \n",  BMPUtils.getValueInLSB(image, bitmapOffset));
+        BMPService.putValueInLSB(image, valueToHide, bitmapOffset);
+        System.out.printf("Hidden value recovered = %02X \n",  BMPService
+            .getValueInLSB(image, bitmapOffset));
 
         // Print to file
       final String s = hexaBytesString(image, bitmapOffset);
