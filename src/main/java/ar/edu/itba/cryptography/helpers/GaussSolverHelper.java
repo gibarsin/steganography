@@ -65,17 +65,18 @@ public abstract class GaussSolverHelper {
    *
    */
   public static int[] solve(final int[][] matrix, final int modulus) {
-    final int rows = getMatrixRows(matrix);
+    final int rows = matrix.length;
+    final int cols = matrix.length + 1; // cols = rows + 1 assuming matrix is valid
     for (int diagonalIndex = 0 ; diagonalIndex < rows ; diagonalIndex ++) {
-      final int maxRowIndex = getRowWithMaxColumnValueIndex(matrix, diagonalIndex);
-      swapCurrentRowWithMaxRow(matrix, diagonalIndex, maxRowIndex);
-      suppressFirstNonZeroColumnBelowCurrentRow(matrix, diagonalIndex, modulus);
+      final int maxRowIndex = getRowWithMaxColumnValueIndex(matrix, diagonalIndex, rows);
+      swapCurrentRowWithMaxRow(matrix, diagonalIndex, cols, maxRowIndex);
+      suppressFirstNonZeroColumnBelowCurrentRow(matrix, diagonalIndex, rows, cols, modulus);
     }
     return solveUpperTriangleMatrix(matrix, modulus);
   }
 
-  private static int getRowWithMaxColumnValueIndex(final int[][] matrix, final int diagonalIndex) {
-    final int rows = getMatrixRows(matrix);
+  private static int getRowWithMaxColumnValueIndex(final int[][] matrix, final int diagonalIndex,
+      final int rows) {
     int maxRowIndex = diagonalIndex;
     int maxValue = matrix[maxRowIndex][maxRowIndex];
     for (int row = diagonalIndex + 1 ; row < rows ; row ++) {
@@ -89,8 +90,10 @@ public abstract class GaussSolverHelper {
   }
 
   private static void swapCurrentRowWithMaxRow(final int[][] matrix, final int diagonalIndex,
-      final int maxRowIndex) { // diagonalIndex == currentRow
-    final int cols = getMatrixCols(matrix);
+      final int cols, final int maxRowIndex) { // diagonalIndex == currentRow
+    if (maxRowIndex == diagonalIndex) {
+      return; // max row already is current row => there's no need to swap
+    }
     for (int col = diagonalIndex ; col < cols ; col ++) {
       final int aux = matrix[diagonalIndex][col];
       matrix[diagonalIndex][col] = matrix[maxRowIndex][col];
@@ -99,56 +102,38 @@ public abstract class GaussSolverHelper {
   }
 
   private static void suppressFirstNonZeroColumnBelowCurrentRow(final int[][] matrix,
-      final int diagonalIndex, final int modulus) {
-    // TODO
+      final int diagonalIndex, final int rows, final int cols, final int modulus) {
+    if (matrix[diagonalIndex][diagonalIndex] == 0) {
+      // the greatest value for the current column among all rows is 0
+      // => there's nothing to suppress as all column elements are 0
+      // (as we are using modulus operations) => skip method call
+      return;
+    }
+
+    for (int row = diagonalIndex + 1 ; row < rows ; row ++) {
+      if (matrix[row][diagonalIndex] == 0) {
+        // current value for main column of the current row is already 0 => skip
+        continue;
+      }
+
+      // If we reached here, we are sure both values for lcm calculation are non-zero integers
+      //   because of the previous checks
+      final int mcm = lcmOf(matrix[diagonalIndex][diagonalIndex], matrix[row][diagonalIndex]);
+      // We know that multiply will be exact as the mcm is multiple of the referenced matrix value
+      final int multiplier = - mcm / matrix[row][diagonalIndex];
+      // This is the value on the column being made 0
+      matrix[row][diagonalIndex] = 0;
+      // We are not multiplying the reference row (i.e.: the one referenced by diagonalIndex)
+      //   so as it can be used in the consecutive row indexed iteration calls
+      for (int col = diagonalIndex + 1 ; col < cols ; col ++) {
+        matrix[row][col] += (multiplier * matrix[diagonalIndex][col]);
+        matrix[row][col] %= modulus;
+      }
+    }
   }
 
   private static int[] solveUpperTriangleMatrix(final int[][] matrix, final int modulus) {
-    return new int[0]; // TODO
-  }
-
-  private static int getMatrixRows(final int[][] matrix) {
-    return matrix.length;
-  }
-
-  private static int getMatrixCols(final int[][] matrix) {
-    return matrix.length + 1; // cols = rows + 1 assuming matrix is valid
-  }
-//  function gauss(A) {
-//    var n = A.length;
-//
-//    for (var i=0; i<n; i++) {
-//      // Search for maximum in this column
-//      var maxEl = Math.abs(A[i][i]);
-//      var maxRow = i;
-//      for(var k=i+1; k<n; k++) {
-//        if (Math.abs(A[k][i]) > maxEl) {
-//          maxEl = Math.abs(A[k][i]);
-//          maxRow = k;
-//        }
-//      }
-//
-//      // Swap maximum row with current row (column by column)
-//      for (var k=i; k<n+1; k++) {
-//        var tmp = A[maxRow][k];
-//        A[maxRow][k] = A[i][k];
-//        A[i][k] = tmp;
-//      }
-//
-//      // Make all rows below this one 0 in current column
-//      for (k=i+1; k<n; k++) {
-//        var c = -A[k][i]/A[i][i];
-//        for(var j=i; j<n+1; j++) {
-//          if (i==j) {
-//            A[k][j] = 0;
-//          } else {
-//            A[k][j] += c * A[i][j];
-//          }
-//        }
-//      }
-//    }
-//
-//    // Solve equation Ax=b for an upper triangular matrix A
+    // Solve equation Ax=b for an upper triangular matrix A
 //    var x= new Array(n);
 //    for (var i=n-1; i>-1; i--) {
 //      x[i] = A[i][n]/A[i][i];
@@ -158,5 +143,41 @@ public abstract class GaussSolverHelper {
 //    }
 //    return x;
 //  }
+    return new int[0]; // TODO
+  }
 
+  /**
+   *
+   * @param x non-zero integer
+   * @param y non-zero integer
+   * @return the least common multiple between x and y
+   */
+  private static int lcmOf(final int x, final int y) {
+    if (x * y == 0) { // mcm is defined only for non-null integers
+      throw new IllegalArgumentException();
+    }
+    final int xAbs =  Math.abs(x);
+    final int yAbs = Math.abs(y);
+    final int a = Math.max(xAbs, yAbs) == xAbs ? xAbs : yAbs;
+    final int b = a == xAbs ? yAbs : xAbs;
+    return  a * b / gcmOf(a, b);
+  }
+
+  /**
+   *
+   * @param a non-zero integer such as |a| >= |b|
+   * @param b integer such as |a| >= |b|
+   * @return the least common divisor between a and b
+   */
+  private static int gcmOf(/* non-final */ int a, /* non-final */ int b) { // Euclid's Algorithm
+    a = Math.abs(a);
+    b = Math.abs(b);
+    int aux;
+    while (b > 0) {
+      aux = b;
+      b = a % b;
+      a = aux;
+    }
+    return a;
+  }
 }
