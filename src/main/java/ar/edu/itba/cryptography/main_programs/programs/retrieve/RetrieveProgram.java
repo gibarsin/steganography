@@ -34,8 +34,22 @@ public class RetrieveProgram implements MainProgram {
     this.bmpIOService = bmpIOService;
   }
 
+  public static MainProgram build(final Map<InputArgs, String> parsedArgs) {
+    final String secret = validateArgAccess(parsedArgs, SECRET, true);
+    final String kString = validateArgAccess(parsedArgs, K, true);
+    validateArgAccess(parsedArgs, N, false);
+    final String dir = validateArgAccess(parsedArgs, IMAGES_DIR, true);
+    final Path pathToOutput = IOService.createOutputFile(secret);
+    final int k = IOService.parseAsInt(kString, K.getDescription());
+    final BMPIOService bmpIOService = new BMPIOService();
+    final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, OpenMode.INPUT);
+    return new RetrieveProgram(pathToOutput, k, pathsToShadows, bmpIOService);
+  }
+
   @Override
   public void run() {
+    // TODO: Somewhere, we have to use the "permutation" seed or sth like that...
+
     // Choose the retrieve algorithm based on the k number
     final RetrieveAlgorithm retrieveAlgorithm = chooseRetrieveAlgorithm(k);
     // Retrieve the secret image header
@@ -67,19 +81,6 @@ public class RetrieveProgram implements MainProgram {
       sb.append(String.format(HEXADECIMAL_FORMAT, aByte));
     }
     return sb;
-  }
-
-  public static MainProgram build(final Map<InputArgs, String> parsedArgs) {
-    final String secret = validateArgAccess(parsedArgs, SECRET, true);
-    final String kString = validateArgAccess(parsedArgs, K, true);
-    validateArgAccess(parsedArgs, N, false);
-    final String dir = validateArgAccess(parsedArgs, IMAGES_DIR, true);
-
-    final Path pathToOutput = IOService.createOutputFile(secret);
-    final int k = IOService.parseAsInt(kString, K.getDescription());
-    final BMPIOService bmpIOService = new BMPIOService();
-    final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, OpenMode.INPUT);
-    return new RetrieveProgram(pathToOutput, k, pathsToShadows, bmpIOService);
   }
 
   /**

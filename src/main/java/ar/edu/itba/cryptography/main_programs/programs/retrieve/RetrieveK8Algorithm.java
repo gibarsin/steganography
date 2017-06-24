@@ -6,12 +6,13 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class RetrieveK8Algorithm implements RetrieveAlgorithm {
+  private static final int FIRST_ELEM_INDEX = 0;
 
   @Override
   public byte[] retrieveHeader(final BMPIOService bmpIOService,
       final List<Path> shadowsPaths) {
-    // get the header of any image => it will be used as the header of the retrieved message
-    return new byte[0]; // TODO
+    // Get the header of any image: it will be used as the header of the retrieved message
+    return bmpIOService.getHeaderBytesOf(shadowsPaths.get(FIRST_ELEM_INDEX));
   }
 
   @Override

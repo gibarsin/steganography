@@ -24,6 +24,7 @@ public class BMPIOService {
     INPUT, OUTPUT
   }
 
+  private static final int FIRST_ELEM_INDEX = 0;
   private static final String BMP_EXT = "glob:*.bmp";
   private static final PathMatcher bmpExtMatcher = FileSystems.getDefault().getPathMatcher(BMP_EXT);
 
@@ -51,6 +52,13 @@ public class BMPIOService {
     return paths;
   }
 
+  public byte[] getHeaderBytesOf(final Path path) {
+    // We are assuming the given path has already been open as input file & path != null
+    return inputFiles.get(path).getHeaderBytes();
+  }
+
+  // private methods
+
   private BMPData createBmpData(final Path path) throws IOException {
     return new BMPData(Files.readAllBytes(path));
   }
@@ -63,7 +71,6 @@ public class BMPIOService {
   }
 
   private static class BMPData {
-
     private final byte[] bmp;
     private int nextByte;
 
@@ -74,6 +81,13 @@ public class BMPIOService {
 
     /* package-private */ byte getNextByte() {
       return bmp[nextByte ++];
+    }
+
+    /* package-private */ byte[] getHeaderBytes() {
+      final int offset = BMPService.getBitmapOffset(bmp);
+      final byte[] header = new byte[offset];
+      System.arraycopy(bmp, FIRST_ELEM_INDEX, header, FIRST_ELEM_INDEX, offset);
+      return header;
     }
   }
 }
