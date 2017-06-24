@@ -24,7 +24,6 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
 
   @Override
   public byte[] retrieveData(final BMPIOService bmpIOService,
-      // TODO: we are assuming that only k shadowsPaths are given
       final List<Path> shadowsPaths, final int dataLength, final int modulus) {
     final int k = shadowsPaths.size();
     final int[][] matrix = initializeMatrix(bmpIOService, shadowsPaths, k, modulus);

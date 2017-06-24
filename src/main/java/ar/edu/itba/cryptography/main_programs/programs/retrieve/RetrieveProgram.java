@@ -4,6 +4,7 @@ import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.IMAGES_
 import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.K;
 import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.N;
 import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.SECRET;
+import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 
 import ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs;
 import ar.edu.itba.cryptography.interfaces.MainProgram;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RetrieveProgram implements MainProgram {
+  private static final int MODULUS = 257;
   private static final String HEXADECIMAL_FORMAT = "%02X";
   private static final int STANDARD_K_VALUE = 8;
 
@@ -43,6 +45,7 @@ public class RetrieveProgram implements MainProgram {
     final int k = IOService.parseAsInt(kString, K.getDescription());
     final BMPIOService bmpIOService = new BMPIOService();
     final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, OpenMode.INPUT);
+    if (k != pathsToShadows.size()) IOService.exit(VALIDATION_FAILED, "k != pathsToShadows.size()");
     return new RetrieveProgram(pathToOutput, k, pathsToShadows, bmpIOService);
   }
 
@@ -59,7 +62,8 @@ public class RetrieveProgram implements MainProgram {
     final int offset = BMPService.getBitmapOffset(header);
     final int dataBytes = size - offset;
     // Retrieve the secret image data
-    final byte[] data = retrieveAlgorithm.retrieveData(bmpIOService, pathsToShadows, dataBytes);
+    final byte[] data =
+        retrieveAlgorithm.retrieveData(bmpIOService, pathsToShadows, dataBytes, MODULUS);
     // Write the retrieved secret (header + data) into the specified output path
     final StringBuilder bmpFileString = hexadecimalBytesToString(header);
     bmpFileString.append(hexadecimalBytesToString(data));
