@@ -30,6 +30,10 @@ public final class BMPService {
     ID(0x0000),
     SIZE(0x0002),
     RESERVED(0x0006),
+    // the following two are for our own purposes
+    SEED(0x0006),
+    SHADOW_NUMBER(0x0008),
+    // -------------------------------------
     BITMAP_OFFSET(0x000A),
     HOR_WIDTH_PIXELS(0x0012),
     VER_WIDTH_PIXELS(0x0016),
@@ -68,11 +72,19 @@ public final class BMPService {
   }
 
   public static void saveSeed(final byte[] image, final char seed) {
-    putValue(image, seed, BMP_OFFSET.RESERVED, BYTES.WORD);
+    putValue(image, seed, BMP_OFFSET.SEED, BYTES.WORD);
   }
 
   public static char recoverSeed(final byte[] image) {
-    return (char) getValue(image, BMP_OFFSET.RESERVED, BYTES.WORD);
+    return (char) getValue(image, BMP_OFFSET.SEED, BYTES.WORD);
+  }
+
+  public static void saveShadowNumber(final byte[] image, final char seed) {
+    putValue(image, seed, BMP_OFFSET.SHADOW_NUMBER, BYTES.WORD);
+  }
+
+  public static char recoverShadowNumber(final byte[] image) {
+    return (char) getValue(image, BMP_OFFSET.SHADOW_NUMBER, BYTES.WORD);
   }
 
   /**

@@ -52,10 +52,19 @@ public class BMPIOService {
     return paths;
   }
 
-  public byte[] getHeaderBytesOf(final Path path) {
-    // We are assuming the given path has already been open as input file & path != null
-    return inputFiles.get(path).getHeaderBytes();
+  public byte[] getHeaderBytesOf(final Path path, final OpenMode mode) {
+    return chooseMapBasedOn(mode).get(path).getHeaderBytes(); // assuming path != null & path opened
   }
+
+  public void setPathMatrixRow(final Path path, final OpenMode mode, final int row) {
+    chooseMapBasedOn(mode).get(path).setMatrixRow(row); // assuming path != null & path opened
+  }
+
+  public int getShadowNumber(final Path path, final OpenMode mode) {
+    // assuming path != null & path opened
+    return BMPService.recoverShadowNumber(chooseMapBasedOn(mode).get(path).getHeaderBytes());
+  }
+
 
   // private methods
 
@@ -73,10 +82,12 @@ public class BMPIOService {
   private static class BMPData {
     private final byte[] bmp;
     private int nextByte;
+    private int matrixRow;
 
     /* package-private */ BMPData(final byte[] bmp) {
       this.bmp = bmp;
       this.nextByte = BMPService.getBitmapOffset(bmp);
+      this.matrixRow = 0;
     }
 
     /* package-private */ byte getNextByte() {
@@ -88,6 +99,14 @@ public class BMPIOService {
       final byte[] header = new byte[offset];
       System.arraycopy(bmp, FIRST_ELEM_INDEX, header, FIRST_ELEM_INDEX, offset);
       return header;
+    }
+
+    public void setMatrixRow(final int matrixIndex) {
+      this.matrixRow = matrixIndex;
+    }
+
+    public int getMatrixRow() {
+      return this.matrixRow;
     }
   }
 }

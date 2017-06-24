@@ -1,5 +1,7 @@
 package ar.edu.itba.cryptography.main_programs.programs.retrieve;
 
+import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.INPUT;
+
 import ar.edu.itba.cryptography.helpers.BitHelper;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
@@ -13,13 +15,13 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
   public byte[] retrieveHeader(final BMPIOService bmpIOService,
       final List<Path> shadowsPaths) {
     // Get the header of any image: it will be used as the header of the retrieved message
-    return bmpIOService.getHeaderBytesOf(shadowsPaths.get(FIRST_ELEM_INDEX));
+    return bmpIOService.getHeaderBytesOf(shadowsPaths.get(FIRST_ELEM_INDEX), INPUT);
   }
 
   @Override
   public byte[] retrieveData(final BMPIOService bmpIOService,
       // TODO: we are assuming that only k shadowsPaths are given
-      final List<Path> shadowsPaths, final int dataLength, final int modulus) {
+      final List<Path> shadowsPaths, final int dataLength, final int modulus) { // TODO
     final int k = shadowsPaths.size();
     final byte[][] matrix = initializeMatrix(bmpIOService, shadowsPaths, k, modulus);
     final byte[] data = new byte[dataLength];
@@ -53,14 +55,14 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
    * @return the constructed matrix = A | b
    */
   private byte[][] initializeMatrix(final BMPIOService bmpIOService, final List<Path> shadowsPaths,
-      final int k, final int modulus) { // TODO
+      final int k, final int modulus) {
     final byte[][] matrix = new byte[k][k+1];
     for (int row = 0 ; row < k ; row ++) {
       final Path path = shadowsPaths.get(row);
-      bmpIOService.setPathMatrixIndex(path, row); // TODO
-      final int x = bmpIOService.getShadowNumber(path); // TODO
+      bmpIOService.setPathMatrixRow(path, INPUT, row);
+      final int x = bmpIOService.getShadowNumber(path, INPUT);
       for (int col = 0 ; col < k ; col ++) {
-        matrix[row][col] = calculateMatrixXTerm(x, k, col, modulus); // TODO
+        matrix[row][col] = calculateMatrixXTerm(x, k, col, modulus);
       }
     }
     return matrix;
