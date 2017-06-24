@@ -2,28 +2,47 @@ package ar.edu.itba.cryptography.main_programs.programs.retrieve;
 
 import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.INPUT;
 
-import ar.edu.itba.cryptography.helpers.BitHelper;
+import ar.edu.itba.cryptography.helpers.ByteHelper;
 import ar.edu.itba.cryptography.helpers.GaussSolverHelper;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
+import ar.edu.itba.cryptography.services.BMPService;
 import java.nio.file.Path;
 import java.util.List;
 
 // IMPORTANT
 //   Care must be taken between conversions of int and byte types.
-//   Use BitHelper.byteToUnsignedInt when needed
+//   Use ByteHelper.byteToUnsignedInt when needed
 public class RetrieveK8Algorithm implements RetrieveAlgorithm {
   private static final int FIRST_ELEM_INDEX = 0;
 
   @Override
-  public byte[] retrieveHeader(final BMPIOService bmpIOService,
+  public String run(final BMPIOService bmpIOService,
+      final List<Path> shadowsPaths, final int modulus) {
+    // TODO: Somewhere, we have to use the "permutation" seed or sth like that...
+
+    // Retrieve the secret image header
+    final byte[] header = this.retrieveHeader(bmpIOService, shadowsPaths);
+    // Get the total data bytes to be retrieved (size - offset)
+    final int size = BMPService.getBitmapSize(header);
+    final int offset = BMPService.getBitmapOffset(header);
+    final int dataBytes = size - offset;
+    // Retrieve the secret image data
+    final byte[] data =
+        this.retrieveData(bmpIOService, shadowsPaths, dataBytes, modulus);
+    // Write the retrieved secret (header + data) into the specified output path
+    final StringBuilder bmpFileString = ByteHelper.hexadecimalBytesToString(header);
+    bmpFileString.append(ByteHelper.hexadecimalBytesToString(data));
+    return bmpFileString.toString();
+  }
+
+  private byte[] retrieveHeader(final BMPIOService bmpIOService,
       final List<Path> shadowsPaths) {
     // Get the header of any image: it will be used as the header of the retrieved message
     return bmpIOService.getHeaderBytesOf(shadowsPaths.get(FIRST_ELEM_INDEX), INPUT);
   }
 
-  @Override
-  public byte[] retrieveData(final BMPIOService bmpIOService,
+  private byte[] retrieveData(final BMPIOService bmpIOService,
       final List<Path> shadowsPaths, final int dataLength, final int modulus) {
     final int k = shadowsPaths.size();
     final int[][] matrix = initializeMatrix(bmpIOService, shadowsPaths, k, modulus);
@@ -35,7 +54,7 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
         final int shadowNumber = bmpIOService.getPathMatrixRow(shadowPath, INPUT);
         // Get byte = p(shadowNumber) (recall that this byte is hidden among several shadow's bytes)
         final byte b = bmpIOService.getNextSecretByte(shadowPath, INPUT);
-        matrix[shadowNumber][k] = BitHelper.byteToUnsignedInt(b);
+        matrix[shadowNumber][k] = ByteHelper.byteToUnsignedInt(b);
       }
       // Solve the equation system to get the k chunk bytes of current iteration
       final byte[] kDataByteChunk = solveEquationSystem(matrix, modulus);
@@ -57,7 +76,7 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
     final int[] x = GaussSolverHelper.solve(matrix, n);
     final byte[] xAsBytes = new byte[x.length];
     for (int i = 0 ; i < x.length ; i++) {
-      xAsBytes[i] = BitHelper.intToByte(x[i]);
+      xAsBytes[i] = ByteHelper.intToByte(x[i]);
     }
     return xAsBytes;
   }
@@ -87,7 +106,7 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
       bmpIOService.setPathMatrixRow(path, INPUT, row);
       final int x = bmpIOService.getShadowNumber(path, INPUT);
       for (int col = 0 ; col < k ; col ++) {
-        matrix[row][col] = BitHelper.byteToUnsignedInt(calculateMatrixXTerm(x, k, col, modulus));
+        matrix[row][col] = ByteHelper.byteToUnsignedInt(calculateMatrixXTerm(x, k, col, modulus));
       }
     }
     return matrix;
@@ -145,6 +164,6 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
       xTerm *= xTerm;
       xTerm %= n;
     }
-    return BitHelper.intToByte(xTerm);
+    return ByteHelper.intToByte(xTerm);
   }
 }

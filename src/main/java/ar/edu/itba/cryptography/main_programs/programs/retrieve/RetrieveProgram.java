@@ -11,7 +11,6 @@ import ar.edu.itba.cryptography.interfaces.MainProgram;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
 import ar.edu.itba.cryptography.services.BMPIOService.OpenMode;
-import ar.edu.itba.cryptography.services.BMPService;
 import ar.edu.itba.cryptography.services.IOService;
 import ar.edu.itba.cryptography.services.IOService.ExitStatus;
 import java.nio.file.Path;
@@ -20,7 +19,6 @@ import java.util.Map;
 
 public class RetrieveProgram implements MainProgram {
   private static final int MODULUS = 257;
-  private static final String HEXADECIMAL_FORMAT = "%02X";
   private static final int STANDARD_K_VALUE = 8;
 
   private final Path pathToOutput;
@@ -51,23 +49,10 @@ public class RetrieveProgram implements MainProgram {
 
   @Override
   public void run() {
-    // TODO: Somewhere, we have to use the "permutation" seed or sth like that...
-
     // Choose the retrieve algorithm based on the k number
-    final RetrieveAlgorithm retrieveAlgorithm = chooseRetrieveAlgorithm(k);
-    // Retrieve the secret image header
-    final byte[] header = retrieveAlgorithm.retrieveHeader(bmpIOService, pathsToShadows);
-    // Get the total data bytes to be retrieved (size - offset)
-    final int size = BMPService.getBitmapSize(header);
-    final int offset = BMPService.getBitmapOffset(header);
-    final int dataBytes = size - offset;
-    // Retrieve the secret image data
-    final byte[] data =
-        retrieveAlgorithm.retrieveData(bmpIOService, pathsToShadows, dataBytes, MODULUS);
-    // Write the retrieved secret (header + data) into the specified output path
-    final StringBuilder bmpFileString = hexadecimalBytesToString(header);
-    bmpFileString.append(hexadecimalBytesToString(data));
-    IOService.appendToFile(this.pathToOutput, bmpFileString.toString());
+    final RetrieveAlgorithm algorithm = chooseRetrieveAlgorithm(this.k);
+    final String bmpAsString = algorithm.run(this.bmpIOService, this.pathsToShadows, MODULUS);
+    IOService.appendToFile(this.pathToOutput, bmpAsString);
     // Close the output path resources
     IOService.closeOutputFile(this.pathToOutput);
   }
@@ -77,14 +62,6 @@ public class RetrieveProgram implements MainProgram {
       return new RetrieveK8Algorithm();
     }
     return new RetrieveCustomAlgorithm();
-  }
-
-  private StringBuilder hexadecimalBytesToString(final byte[] bytes) {
-    final StringBuilder sb = new StringBuilder();
-    for (byte aByte : bytes) {
-      sb.append(String.format(HEXADECIMAL_FORMAT, aByte));
-    }
-    return sb;
   }
 
   /**
