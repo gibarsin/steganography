@@ -31,7 +31,7 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
       for (final Path shadowPath : shadowsPaths) {
         final int shadowNumber = bmpIOService.getPathMatrixRow(shadowPath, INPUT);
         // Get byte = p(shadowNumber) (recall that this byte is hidden among several shadow's bytes)
-        matrix[shadowNumber][k] = bmpIOService.getNextSecretByte(shadowPath, INPUT); // TODO
+        matrix[shadowNumber][k] = bmpIOService.getNextSecretByte(shadowPath, INPUT);
       }
       // Solve the equation system to get the k chunk bytes of current iteration
       final byte[] kDataByteChunk = solveEquationSystem(matrix, modulus);

@@ -61,12 +61,18 @@ public class BMPIOService {
   }
 
   public int getPathMatrixRow(final Path path, final OpenMode mode) {
-    return chooseMapBasedOn(mode).get(path).getMatrixRow();
+    return chooseMapBasedOn(mode).get(path).getMatrixRow(); // assuming path != null & path opened
   }
 
   public int getShadowNumber(final Path path, final OpenMode mode) {
     // assuming path != null & path opened
     return BMPService.recoverShadowNumber(chooseMapBasedOn(mode).get(path).getHeaderBytes());
+  }
+
+  public byte getNextSecretByte(final Path path, final OpenMode mode) { // TODO: bad feeling
+    // assuming path != null & path opened
+    final BMPData bmpData = chooseMapBasedOn(mode).get(path);
+    return BMPService.getValueInLSB(bmpData.getBmp(), bmpData.getNext8BytesOffset());
   }
 
   // private methods
@@ -93,8 +99,14 @@ public class BMPIOService {
       this.matrixRow = 0;
     }
 
-    /* package-private */ byte getNextByte() {
-      return bmp[nextByte ++];
+    /* package-private */ byte[] getBmp() {
+      return this.bmp;
+    }
+
+    /* package-private */ int getNext8BytesOffset() {
+      final int aux = this.nextByte;
+      this.nextByte += 8; // 8 bytes will be consumed if this method is called
+      return aux;
     }
 
     /* package-private */ byte[] getHeaderBytes() {
@@ -104,11 +116,11 @@ public class BMPIOService {
       return header;
     }
 
-    public void setMatrixRow(final int matrixIndex) {
+    /* package-private */ void setMatrixRow(final int matrixIndex) {
       this.matrixRow = matrixIndex;
     }
 
-    public int getMatrixRow() {
+    /* package-private */ int getMatrixRow() {
       return this.matrixRow;
     }
   }
