@@ -17,11 +17,17 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
 
   @Override
   public byte[] retrieveData(final BMPIOService bmpIOService,
-      final List<Path> shadowsPaths, final int dataLength) {
+      final List<Path> shadowsPaths, final int dataLength) { // TODO
+    final int k = shadowsPaths.size(); // TODO: we are assuming that only k shadowsPaths are given
+    final byte[] data = new byte[dataLength];
     // for each byte to retrieve
-    //  for each shadow i file
-    //    get byte = p(i) joining, from the first to the last byte of the range, the last bit of each byte in the range
-    //  solve the equation system using the Gauss method => this is the byte of the current iteration
-    return new byte[0]; // TODO
+    for (int i = 0 ; i < dataLength ; i++) {
+      //  for each shadow i file
+      for (final Path shadowPath : shadowsPaths) {
+        // get byte = p(i) joining, from the first to the last byte of the range, the last bit of each byte in the range
+      }
+      //  solve the equation system using the Gauss method => this is the byte of the current iteration
+    }
+    return data;
   }
 }
