@@ -3,10 +3,6 @@ package ar.edu.itba.cryptography.helpers;
 // Code taken & adapted from:
 // https://martin-thoma.com/solving-linear-equations-with-gaussian-elimination
 public abstract class GaussSolverHelper {
-
-  // TODO: check: ¿should be as int or as byte? (decide to be int and then transform it to byte)
-  // https://stackoverflow.com/questions/7401550/how-to-convert-int-to-unsigned-byte-and-back
-
   /**
    * Solves the equation system represented by the specified matrix and returns the solution
    * array. Note that all operations will be calculated using the specified modulus
@@ -72,7 +68,7 @@ public abstract class GaussSolverHelper {
       swapCurrentRowWithMaxRow(matrix, diagonalIndex, cols, maxRowIndex);
       suppressFirstNonZeroColumnBelowCurrentRow(matrix, diagonalIndex, rows, cols, modulus);
     }
-    return solveUpperTriangleMatrix(matrix, modulus);
+    return solveUpperTriangleMatrix(matrix, rows, modulus);
   }
 
   private static int getRowWithMaxColumnValueIndex(final int[][] matrix, final int diagonalIndex,
@@ -132,18 +128,54 @@ public abstract class GaussSolverHelper {
     }
   }
 
-  private static int[] solveUpperTriangleMatrix(final int[][] matrix, final int modulus) {
-    // Solve equation Ax=b for an upper triangular matrix A
-//    var x= new Array(n);
-//    for (var i=n-1; i>-1; i--) {
-//      x[i] = A[i][n]/A[i][i];
-//      for (var k=i-1; k>-1; k--) {
-//        A[k][n] -= A[k][i] * x[i];
-//      }
-//    }
-//    return x;
-//  }
-    return new int[0]; // TODO
+  /**
+   * Solve equation Ax=b for an upper triangular matrix
+   *
+   * @param matrix the upper triangle matrix A | b
+   * @param rows the size of the A matrix. Note that rows(matrix) = rows(A),
+   *             but cols(matrix) = rows(A) + 1
+   * @param modulus the modulus operator to be used through the system solving
+   * @return the x array of size {@code rows} that solves the system
+   */
+  private static int[] solveUpperTriangleMatrix(final int[][] matrix,
+      final int rows, final int modulus) {
+    // matrix is k * k+1 because it has the b column appended (matrix = A | b as specified above).
+    // That's why we should use the 'rows' length instead of the 'cols' length
+    // Note also that rows = cols - 1 => matrix[row][rows] is accessing last column of row `row`
+    // Recall that the last valid row access is at index = row-1 (i.e.: from 0 to row-1)
+    final int[] x = new int[rows];
+    for (int diagonalI = rows-1 ; diagonalI >= 0 ; diagonalI --) {
+      // Solve each diagonal variable
+      x[diagonalI] = modDivision(matrix[diagonalI][rows], matrix[diagonalI][diagonalI], modulus);
+      // Use the current calculated value to make the current column
+      // all zeros values by passing each value as a subtraction to the b term
+      for (int aboveRow = diagonalI - 1 ; aboveRow >= 0 ; aboveRow --) {
+        matrix[aboveRow][rows] -= (matrix[aboveRow][diagonalI] * x[diagonalI]);
+      }
+    }
+    return x;
+  }
+
+  /**
+   *
+   * @param a integer in range [0, n-1]
+   * @param b integer in range [0, n-1], with b and n coprime
+   * @param n modulus to use to calculate the division. n and b should be coprime.
+   *            Note that if b is in the specified range and n is prime, the previous condition
+   *            is automatically met
+   * @return the k such as b * k = a (modulus n)
+   * @implNote If any of the above condition is not met, a runtime exception is thrown
+   */
+  private static int modDivision(final int a, final int b, final int n) {
+    if (a >= n || a < 0) throw new IllegalArgumentException("a should be in range [0, n-1]");
+    if (b >= n || b < 0) throw new IllegalArgumentException("b should be in range [0, n-1]");
+    if (n % b == 0) throw new IllegalArgumentException("b and n should be coprime");
+    final int aMod = a % n;
+    for (int k = 0 ; k < n ; k ++) {
+      if (((k * b) % n) == aMod) return k;
+    }
+    // Should never reach here
+    throw new IllegalStateException("Invalid modDivision: a = " + a + "; b = " + b + "; n = " + n);
   }
 
   /**
