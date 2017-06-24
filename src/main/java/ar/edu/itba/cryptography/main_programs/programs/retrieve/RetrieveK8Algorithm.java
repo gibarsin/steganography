@@ -4,6 +4,7 @@ import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.INPUT;
 
 import ar.edu.itba.cryptography.helpers.ByteHelper;
 import ar.edu.itba.cryptography.helpers.GaussSolverHelper;
+import ar.edu.itba.cryptography.helpers.ObfuscatorHelper;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
 import ar.edu.itba.cryptography.services.BMPService;
@@ -19,20 +20,20 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
   @Override
   public String run(final BMPIOService bmpIOService,
       final List<Path> shadowsPaths, final int modulus) {
-    // TODO: Somewhere, we have to use the "permutation" seed or sth like that...
-
     // Retrieve the secret image header
-    final byte[] header = this.retrieveHeader(bmpIOService, shadowsPaths);
+    final byte[] header = retrieveHeader(bmpIOService, shadowsPaths);
     // Get the total data bytes to be retrieved (size - offset)
     final int size = BMPService.getBitmapSize(header);
     final int offset = BMPService.getBitmapOffset(header);
     final int dataBytes = size - offset;
-    // Retrieve the secret image data
-    final byte[] data =
-        this.retrieveData(bmpIOService, shadowsPaths, dataBytes, modulus);
+    // Retrieve the obfuscated secret image data
+    final byte[] obfuscatedData = retrieveData(bmpIOService, shadowsPaths, dataBytes, modulus);
+    // Remove obfuscation
+    final int seed = BMPService.recoverSeed(header);
+    final byte[] originalData = ObfuscatorHelper.toggleObfuscation(obfuscatedData, seed);
     // Write the retrieved secret (header + data) into the specified output path
     final StringBuilder bmpFileString = ByteHelper.hexadecimalBytesToString(header);
-    bmpFileString.append(ByteHelper.hexadecimalBytesToString(data));
+    bmpFileString.append(ByteHelper.hexadecimalBytesToString(originalData));
     return bmpFileString.toString();
   }
 

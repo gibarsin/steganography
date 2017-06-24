@@ -1,5 +1,6 @@
 package ar.edu.itba.cryptography;
 
+import ar.edu.itba.cryptography.helpers.ObfuscatorHelper;
 import ar.edu.itba.cryptography.services.BMPService;
 import ar.edu.itba.cryptography.services.IOService;
 import java.io.IOException;
@@ -105,8 +106,9 @@ public final class App
         System.out.println("Bits per pixel = " + BMPService.getBitsPerPixel(image));
 
         // Save and recover seed (For testing purposes)
-        System.out.println("Seed to save in image = " + (int) PermutationTable.getSEED());
-        BMPService.saveSeed(image, PermutationTable.getSEED());
+        final char seed = ObfuscatorHelper.generateSeed();
+        System.out.println("Seed to save in image = " + (int) seed);
+        BMPService.saveSeed(image, seed);
         System.out.println("Seed recovered from image = " + (int) BMPService.recoverSeed(image));
 
         // Hide value
