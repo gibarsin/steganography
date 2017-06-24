@@ -292,16 +292,6 @@ public class IOService {
     }
   }
 
-  public static List<Path> openAllByteFilesFrom(final String dir) {
-//      final Predicate<? super Path> customFilter) {
-//    try (final Stream<Path> paths = Files.walk(Paths.get(dir))) {
-//      return paths.filter(Files::isRegularFile).filter(customFilter).collect(Collectors.toList());
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-    return new LinkedList<>(); // TODO
-  }
-
   /**
    * Closes the given {@code pathToFile} file
    * @param pathToFile path to the input file to be closed

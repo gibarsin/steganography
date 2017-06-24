@@ -3,7 +3,7 @@ package ar.edu.itba.cryptography.main_programs;
 import ar.edu.itba.cryptography.interfaces.MainProgramBuilder;
 import ar.edu.itba.cryptography.main_programs.programs.DistributionProgram;
 import ar.edu.itba.cryptography.main_programs.programs.HelpProgram;
-import ar.edu.itba.cryptography.main_programs.programs.RetrieveProgram;
+import ar.edu.itba.cryptography.main_programs.programs.retrieve.RetrieveProgram;
 
 public abstract class ProgramBuilderFactory {
   /*
