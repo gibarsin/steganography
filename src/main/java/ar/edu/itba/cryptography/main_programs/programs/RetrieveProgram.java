@@ -24,9 +24,7 @@ public class RetrieveProgram implements MainProgram {
 
   @Override
   public void run() {
-    // TODO
-    System.out.println(pathToOutput);
-    System.out.println(k);
+    // TODO: DOING
     pathsToShadows.forEach(System.out::println);
   }
 
@@ -38,7 +36,7 @@ public class RetrieveProgram implements MainProgram {
 
     final Path pathToOutput = IOService.createOutputFile(secret);
     final int k = IOService.parseAsInt(kString, K.getDescription());
-    final List<Path> pathsToShadows = IOService.openAllByteFilesFrom(dir);
+    final List<Path> pathsToShadows = IOService.openAllByteFilesFrom(dir); // TODO
     return new RetrieveProgram(pathToOutput, k, pathsToShadows);
   }
 

@@ -195,13 +195,18 @@ public class IOService {
    * @return the path to the just created file
    */
   private static Path createFile(final String destFolder, final String file, final String data) {
-    final File dataFolder = new File(destFolder);
-    // tries to make directory
-    if (Files.notExists(Paths.get(destFolder)) && !dataFolder.mkdirs()) {
-      exit(MKDIRS_FAILED, destFolder);
-    }
+    return createFile(Paths.get(destFolder, file), data);
+  }
 
-    final Path pathToFile = Paths.get(destFolder, file);
+  private static Path createFile(final Path pathToFile, final String data) {
+    final Path destFolder = pathToFile.normalize().getParent();
+    if (destFolder != null) {
+      final File dataFolder = new File(destFolder.toString());
+      // tries to make directory
+      if (Files.notExists(destFolder) && !dataFolder.mkdirs()) {
+        exit(MKDIRS_FAILED, destFolder);
+      }
+    }
 
     if(Files.exists(pathToFile)) {
       deleteWhenExists(pathToFile);
