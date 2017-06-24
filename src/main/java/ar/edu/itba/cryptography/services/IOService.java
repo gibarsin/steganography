@@ -62,11 +62,6 @@ public class IOService {
     WRITE_FILE_ERROR(-11,
         "[FAIL] - An unexpected IO Exception occurred while writing the file. Caused by: ",
         "[FAIL] -  An unexpected IO Exception occurred while writing a file." + CHECK_LOGS),
-    PARTICLES_AT_SAME_POSITION(-12,
-        "[FAIL] - Both particles of the system are at the same position.\n" +
-            "Particle a: {};\n" +
-            "Particle b: {} ",
-        "[FAIL] - Both particles of the system are at the same position." + ABORTING),
     COULD_NOT_OPEN_OUTPUT_FILE(-13,
         "[FAIL] - Could not open output file: {}",
         "[FAIL] - Could not open an output file." + ABORTING),

@@ -25,16 +25,32 @@ public class RetrieveK8Algorithm implements RetrieveAlgorithm {
     final int k = shadowsPaths.size();
     final byte[][] matrix = initializeMatrix(bmpIOService, shadowsPaths, k, modulus);
     final byte[] data = new byte[dataLength];
-    // for each group of k bytes to retrieve
+    // For each group of k bytes to retrieve
     for (int i = 0 ; i < dataLength ; i += k) {
-      //  for each shadow file (shadow index = j, with 1 <= j <= n)
+      // For each shadow file (shadow number = j, with 1 <= j <= n)
       for (final Path shadowPath : shadowsPaths) {
-        // get byte = p(i) joining, from the first to the last byte of the range, the last bit of each byte in the range
-
+        final int shadowNumber = bmpIOService.getPathMatrixRow(shadowPath, INPUT);
+        // Get byte = p(shadowNumber) (recall that this byte is hidden among several shadow's bytes)
+        matrix[shadowNumber][k] = bmpIOService.getNextSecretByte(shadowPath, INPUT); // TODO
       }
-      // solve the equation system using the Gauss method => this is the byte of the current iteration
+      // Solve the equation system to get the k chunk bytes of current iteration
+      final byte[] kDataByteChunk = solveEquationSystem(matrix, modulus);
+      if (kDataByteChunk.length != k) throw new IllegalStateException("kDataByteChunk.length != k");
+      // Copy the k bytes to the data array
+      System.arraycopy(kDataByteChunk, FIRST_ELEM_INDEX, data, i, k);
     }
     return data;
+  }
+
+  /**
+   * Solve the equation system represented by {@code matrix} using the Gauss method in arithmetic
+   * operations in modulus {@code n}.
+   * @param matrix the matrix representing the equation system A | b
+   * @param n the modulus to be used for arithmetic operations
+   * @return the x array solution of the equation system Ax = b
+   */
+  private byte[] solveEquationSystem(final byte[][] matrix, final int n) {
+    return new byte[0]; // TODO
   }
 
   /**

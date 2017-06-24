@@ -60,11 +60,14 @@ public class BMPIOService {
     chooseMapBasedOn(mode).get(path).setMatrixRow(row); // assuming path != null & path opened
   }
 
+  public int getPathMatrixRow(final Path path, final OpenMode mode) {
+    return chooseMapBasedOn(mode).get(path).getMatrixRow();
+  }
+
   public int getShadowNumber(final Path path, final OpenMode mode) {
     // assuming path != null & path opened
     return BMPService.recoverShadowNumber(chooseMapBasedOn(mode).get(path).getHeaderBytes());
   }
-
 
   // private methods
 
