@@ -10,7 +10,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -18,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class IOService {
   private static final Logger LOGGER = LoggerFactory.getLogger(IOService.class);
+  private static final String CWD = System.getProperty("user.dir");
 
   private static final String CHECK_LOGS = "\nCheck logs for more info.";
   private static final String ABORTING = CHECK_LOGS + "\nAborting...";
@@ -36,7 +41,7 @@ public class IOService {
         "[FAIL] - Bad number of arguments. Try 'help' for more information.",
         "[FAIL] - Bad number of arguments. Try 'help' for more information."),
     NUMBER_EXPECTED(-4,
-        "[FAIL] - {} must be a number. Caused by: ",
+        "[FAIL] - Argument must be a number: {}",
         "[FAIL] - Invalid argument. Try 'help' for more information." + ABORTING),
     NOT_A_FILE(-5, "", ""),
     UNEXPECTED_ERROR(-6,
@@ -69,7 +74,7 @@ public class IOService {
         "[FAIL] - Could not open input file: {}",
         "[FAIL] - Could not open an input file." + ABORTING),
     BAD_ARGUMENT(-15,
-        "[FAIL] - Invalid argument. Try 'help' for more information.",
+        "[FAIL] - Invalid argument: {}.",
         "[FAIL] - Invalid argument. Try 'help' for more information.");
 
     private final int code;
@@ -93,6 +98,51 @@ public class IOService {
     public String getMsg() {
       return msg;
     }
+  }
+
+  /**
+   * Access i-th element of the array
+   * validating that the args array has the necessary length to access it.
+   * @param args The array that will be validated
+   * @param i The index that wants to be accessed
+   * @return The i-th element of the args array, if access is valid;
+   *         otherwise, program is automatically aborted, with a corresponding error message
+   */
+  public static String validArgsAccess(final String[] args, final int i) {
+    if (args.length <= i) {
+      IOService.exit(IOService.ExitStatus.BAD_N_ARGUMENTS, null);
+      // should never return from the above code
+      throw new IllegalStateException();
+    }
+
+    return args[i];
+  }
+
+  /**
+   * Creates the specified {@code fileName}.
+   * <P>
+   * It also prepares the file for being written.
+   * After using this file, you MUST close the file using the method provided by this service.
+   * IF NOT, DATA CAN BE LOST
+   * <P>
+   * The destination folder for the file must exists.
+   * <P>
+   * If the file exists, it tries to delete it first.
+   * <P>
+   * If anything fails during these operations,
+   * program is aborted with a detail log and display message,
+   * and the corresponding exit status code.
+   * @param fileName file path + name + extension
+   * @return path of the created output file
+   *
+   */
+  public static Path createOutputFile(final String fileName) {
+    final Path pathToFile = IOService.createFile(CWD, fileName);
+    if (!IOService.openOutputFile(pathToFile, true)) {
+      IOService.exit(COULD_NOT_OPEN_OUTPUT_FILE, pathToFile);
+    }
+    // only reach here if could open file
+    return pathToFile;
   }
 
   /**
@@ -237,6 +287,16 @@ public class IOService {
     }
   }
 
+  public static List<Path> openAllByteFilesFrom(final String dir) {
+//      final Predicate<? super Path> customFilter) {
+//    try (final Stream<Path> paths = Files.walk(Paths.get(dir))) {
+//      return paths.filter(Files::isRegularFile).filter(customFilter).collect(Collectors.toList());
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+    return new LinkedList<>(); // TODO
+  }
+
   /**
    * Closes the given {@code pathToFile} file
    * @param pathToFile path to the input file to be closed
@@ -318,8 +378,6 @@ public class IOService {
    * @param pathToFile the file path that refers to the file that will be deleted
    */
   private static void deleteWhenExists(final Path pathToFile) {
-
-
     try {
       Files.deleteIfExists(pathToFile);
     } catch(IOException e) {

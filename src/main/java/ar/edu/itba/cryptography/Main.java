@@ -1,10 +1,9 @@
 package ar.edu.itba.cryptography;
 
-import static ar.edu.itba.cryptography.helpers.InputParam.D_METHOD;
-import static ar.edu.itba.cryptography.helpers.InputParam.H_METHOD;
-import static ar.edu.itba.cryptography.helpers.InputParam.METHOD;
-import static ar.edu.itba.cryptography.helpers.InputParam.R_METHOD;
+import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.*;
 
+import ar.edu.itba.cryptography.helpers.InputArgsHelper;
+import ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs;
 import ar.edu.itba.cryptography.interfaces.MainProgram;
 import ar.edu.itba.cryptography.interfaces.MainProgramBuilder;
 import ar.edu.itba.cryptography.main_programs.ProgramBuilderFactory;
@@ -17,9 +16,9 @@ public class Main {
   private static final Map<String, MainProgramBuilder> mainPrograms;
   static {
     mainPrograms = new HashMap<>();
-    mainPrograms.put(H_METHOD.getName(), ProgramBuilderFactory.helpProgramBuilder());
-    mainPrograms.put(D_METHOD.getName(), ProgramBuilderFactory.distributionProgramBuilder());
-    mainPrograms.put(R_METHOD.getName(), ProgramBuilderFactory.retrieveProgramBuilder());
+    mainPrograms.put(HELP_PROGRAM.getType(), ProgramBuilderFactory.helpProgramBuilder());
+    mainPrograms.put(DISTRIBUTION_PROGRAM.getType(), ProgramBuilderFactory.distrProgramBuilder());
+    mainPrograms.put(RETRIEVE_PROGRAM.getType(), ProgramBuilderFactory.retrieveProgramBuilder());
   }
 
   public static void main(String[] args) {
@@ -37,11 +36,11 @@ public class Main {
     if (args.length == 0) {
       IOService.exit(IOService.ExitStatus.NO_ARGS, null);
     }
-    final String method = args[METHOD.getIndex()];
-    final MainProgramBuilder mainProgramBuilder = mainPrograms.get(method);
+    final Map<InputArgs, String> parsedArgs = InputArgsHelper.parseArgs(args);
+    final MainProgramBuilder mainProgramBuilder = mainPrograms.get(parsedArgs.get(MAIN_PROGRAM));
     if (mainProgramBuilder == null) {
       return Optional.empty();
     }
-    return Optional.of(mainProgramBuilder.build(args));
+    return Optional.of(mainProgramBuilder.build(parsedArgs));
   }
 }

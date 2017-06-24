@@ -15,11 +15,11 @@ public abstract class ProgramBuilderFactory {
     return args -> new HelpProgram();
   }
 
-  public static MainProgramBuilder distributionProgramBuilder() {
+  public static MainProgramBuilder distrProgramBuilder() {
     return DistributionProgram::new;
   }
 
   public static MainProgramBuilder retrieveProgramBuilder() {
-    return RetrieveProgram::new;
+    return RetrieveProgram::build;
   }
 }
