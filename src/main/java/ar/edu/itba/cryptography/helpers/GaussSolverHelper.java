@@ -6,12 +6,9 @@ public abstract class GaussSolverHelper {
   /**
    * Solves the equation system represented by the specified matrix and returns the solution
    * array. Note that all operations will be calculated using the specified modulus
-   *
-   * @param matrix The matrix representing the system equation to be solved (it will be transformed)
-   * @param modulus The modulus to be applied to each calculus
-   * @return The system equation array solution, if any, with values in a valid modulus range
-   * @implNote
-   * Ax = b =>
+   * <pre>
+   * Let's dig into the implementation idea itself. Consider the following equation system
+   * Ax = b, where A is a matrix, x is the unknown vector and b is the known answer vecto =>
    *   matrix = A | b (size k x k+1)
    *   x = value to be returned (size k)
    *
@@ -58,7 +55,10 @@ public abstract class GaussSolverHelper {
    * When we get the upper triangular matrix
    * (i.e.: all elements below the main diagonal are zero),
    * we solve the Ax = b system equation
-   *
+   * </pre>
+   * @param matrix The matrix representing the system equation to be solved (it will be transformed)
+   * @param modulus The modulus to be applied to each calculus
+   * @return The system equation array solution, if any, with values in a valid modulus range
    */
   public static int[] solve(final int[][] matrix, final int modulus) {
     final int rows = matrix.length;
