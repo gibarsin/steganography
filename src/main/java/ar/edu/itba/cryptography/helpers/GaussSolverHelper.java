@@ -170,9 +170,9 @@ public abstract class GaussSolverHelper {
     if (a >= n || a < 0) throw new IllegalArgumentException("a should be in range [0, n-1]");
     if (b >= n || b < 0) throw new IllegalArgumentException("b should be in range [0, n-1]");
     if (n % b == 0) throw new IllegalArgumentException("b and n should be coprime");
-    final int aMod = a % n;
+    // Note that a == (a % n)
     for (int k = 0 ; k < n ; k ++) {
-      if (((k * b) % n) == aMod) return k;
+      if (((k * b) % n) == a) return k;
     }
     // Should never reach here
     throw new IllegalStateException("Invalid modDivision: a = " + a + "; b = " + b + "; n = " + n);
