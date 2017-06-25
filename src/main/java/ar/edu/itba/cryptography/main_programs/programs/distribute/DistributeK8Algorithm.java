@@ -2,16 +2,19 @@ package ar.edu.itba.cryptography.main_programs.programs.distribute;
 
 import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.INPUT;
 import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.OUTPUT;
+import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 
 import ar.edu.itba.cryptography.helpers.ByteHelper;
 import ar.edu.itba.cryptography.helpers.MatrixHelper;
 import ar.edu.itba.cryptography.helpers.ObfuscatorHelper;
 import ar.edu.itba.cryptography.interfaces.DistributeAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
+import ar.edu.itba.cryptography.services.IOService;
 import java.nio.file.Path;
 import java.util.List;
 
 public class DistributeK8Algorithm implements DistributeAlgorithm {
+  private static final int FIRST_ELEM_INDEX = 0;
   private static final int MODULUS = 257;
 
   @Override
@@ -20,6 +23,12 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
     // Note: 'obf' stands for 'obfuscated'
     // Extract the data bytes only
     final byte[] data = bmpIOService.getDataBytes(pathToSecret, INPUT);
+    // Validate (with exit code error, if any) the given k according to the data size
+    if (data.length < k ||  data.length % k != 0) {
+      IOService.exit(VALIDATION_FAILED, "It should happen that secret.length >= k "
+          + "&& secret.length % k == 0. Current values: secret.length = " + data.length + "; k = ");
+      throw new IllegalStateException(); // Should never reach here
+    }
     // Generate a seed for the obfuscation
     final char seed = ObfuscatorHelper.generateSeed();
     // Obfuscate the data bytes using the generated seed
@@ -30,7 +39,7 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
     // Save the seed in all shadows and persist the new shadow number and seed information
     saveSeedAndOverwriteShadows(bmpIOService, pathsToShadows, seed);
     // Distribute the obfuscated data into the shadows in chunks of k bytes using the built matrix
-    distributeData(bmpIOService, obfData, pathsToShadows, matrixA, k, MODULUS); // TODO
+    distributeData(bmpIOService, obfData, pathsToShadows, matrixA, k, MODULUS);
   }
 
   private void saveSeedAndOverwriteShadows(final BMPIOService bmpIOService,
@@ -39,6 +48,32 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
       bmpIOService.setSeed(path, OUTPUT, seed);
       bmpIOService.writeDataToDisk(path, OUTPUT);
     }
+  }
+
+  private void distributeData(final BMPIOService bmpIOService, final byte[] obfData,
+      final List<Path> pathsToShadows, final int[][] matrixA, final int k, final int modulus) { // TODO
+    // If we are here, we know that obfData.length % k == 0
+    // Take chunks of k bytes from obfData to build and solve each polynomial, until all
+    // obfData bytes have been distributed
+    for (int distributedBytes = 0 ; distributedBytes < obfData.length ; distributedBytes += k) {
+      // Get the next k bytes in the order ak-1, ..., a1, a0 (see method documentation)
+      final byte[] arrayX = getNextKBytes(obfData, distributedBytes, k);
+      // Resolve the polynomial for all shadow numbers, i.e., perform Ax = b = P([1,n]), with
+      // n the max shadow number, taking int account the modulus arithmetic
+      final byte[] arrayB =
+          resolvePolynomialForAllShadowNumbers(matrixA, arrayX, modulus); // TODO
+      // Distribute each polynomial evaluation to its corresponding shadow
+      distributePolynomialEvaluations(arrayB, bmpIOService, pathsToShadows); // TODO
+    }
+  }
+
+  private byte[] getNextKBytes(final byte[] obfData, final int distributedBytes, final int k) {
+    final byte[] originalArrayX = new byte[k];
+    System.arraycopy(obfData, distributedBytes, originalArrayX, FIRST_ELEM_INDEX, k);
+    // As the paper algorithm suggest us to use the order a0, a1, ... ak-1
+    // instead of ak-1, ..., a1, a0, and we are going to calculate matrixA x arrayX, we need
+    // to reverse the array order to strictly implement the paper algorithm
+    return reverseArray(originalArrayX); // TODO
   }
 
   /**

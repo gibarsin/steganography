@@ -56,6 +56,7 @@ public class DistributeProgram implements MainProgram {
       IOService.exit(VALIDATION_FAILED, "n != pathsToShadows.size()");
       throw new IllegalStateException(); // Should never return from the above method
     }
+    // TODO: validate that k <= (n || pathsToShadows.size())
     return new DistributeProgram(pathToInput, k, pathsToShadows, bmpIOService);
   }
 
