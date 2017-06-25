@@ -12,14 +12,12 @@ import ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs;
 import ar.edu.itba.cryptography.interfaces.MainProgram;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
-import ar.edu.itba.cryptography.services.BMPIOService.OpenMode;
 import ar.edu.itba.cryptography.services.IOService;
 import ar.edu.itba.cryptography.services.IOService.ExitStatus;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.commons.io.FileUtils;
 
 public class RetrieveProgram implements MainProgram {
   private static final int STANDARD_K_VALUE = 8;
@@ -60,7 +58,7 @@ public class RetrieveProgram implements MainProgram {
     // Choose the retrieve algorithm based on the k number
     final RetrieveAlgorithm algorithm = chooseRetrieveAlgorithm(this.k);
     // Get the bmp file data
-    final byte[] bmp = algorithm.run(this.bmpIOService, this.pathsToShadows); // TODO
+    final byte[] bmp = algorithm.run(this.bmpIOService, this.pathsToShadows);
     // Write the bmp file to the specified output path
     IOService.writeByteArrayToFile(this.pathToOutput, bmp);
     // Close all the shadows files paths

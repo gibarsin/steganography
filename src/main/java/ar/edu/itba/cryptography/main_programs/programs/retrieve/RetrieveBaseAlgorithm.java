@@ -9,6 +9,7 @@ import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
 import java.nio.file.Path;
 import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
 
 /*
  * IMPORTANT:
@@ -52,6 +53,12 @@ import java.util.List;
       }
       // Solve the equation system to get the k chunk bytes of current iteration
       final byte[] kDataByteChunk = solveEquationSystem(matrix, MODULUS);
+      /*
+        TODO: check this: I assume it is needed as bytes are retrieved in the order:
+        ak-1, ak-2, ..., a1, a0, but, following the paper, they should be retrieved as:
+          a0, a1, ..., ak-2, ak-1
+       */
+      ArrayUtils.reverse(kDataByteChunk);
       if (kDataByteChunk.length != k) throw new IllegalStateException("kDataByteChunk.length != k");
       // Copy the k bytes to the data array
       System.arraycopy(kDataByteChunk, FIRST_ELEM_INDEX, data, i, k);
