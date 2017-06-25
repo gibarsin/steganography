@@ -214,7 +214,7 @@ public class IOService {
    * @param data data to be saved on the new file
    * @return the path to the just created file
    */
-  public static Path createFile(final Path pathToFile, final String data) {
+  private static Path createFile(final Path pathToFile, final String data) {
     final Path destFolder = pathToFile.normalize().getParent();
     if (destFolder != null) {
       final File dataFolder = new File(destFolder.toString());

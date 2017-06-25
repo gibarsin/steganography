@@ -136,7 +136,7 @@ public class BMPIOService {
 
   public void writeDataToDisk(final Path path, final OpenMode mode) {
     final byte[] bmp = chooseMapBasedOn(mode).get(path).getBmp();
-    IOService.createFile(path, ByteHelper.hexadecimalBytesToString(bmp));
+    IOService.writeByteArrayToFile(path, bmp);
   }
 
   // private methods

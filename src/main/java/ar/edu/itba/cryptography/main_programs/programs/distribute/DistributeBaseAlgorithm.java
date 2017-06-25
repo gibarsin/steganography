@@ -3,6 +3,7 @@ package ar.edu.itba.cryptography.main_programs.programs.distribute;
 import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.OUTPUT;
 import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 
+import ar.edu.itba.cryptography.helpers.ByteHelper;
 import ar.edu.itba.cryptography.helpers.MatrixHelper;
 import ar.edu.itba.cryptography.helpers.ObfuscatorHelper;
 import ar.edu.itba.cryptography.interfaces.DistributeAlgorithm;
@@ -112,7 +113,7 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
   private void decrementFirstNonZeroElement(final byte[] arrayX) {
     // As arrayX is [a0, ..., ak-1]
     for (int i = 0; i < arrayX.length ; i++) {
-      if (arrayX[i] > 0) {
+      if (ByteHelper.byteToUnsignedInt(arrayX[i]) > 0) {
         arrayX[i] -= ((byte) 1);
         return;
       }

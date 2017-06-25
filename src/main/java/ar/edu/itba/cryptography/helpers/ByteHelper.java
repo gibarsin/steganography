@@ -13,6 +13,7 @@ public abstract class ByteHelper {
     return (byte) i;
   }
 
+  @Deprecated
   public static String hexadecimalBytesToString(final byte[] bytes) {
     final StringBuilder sb = new StringBuilder();
     for (byte aByte : bytes) {
