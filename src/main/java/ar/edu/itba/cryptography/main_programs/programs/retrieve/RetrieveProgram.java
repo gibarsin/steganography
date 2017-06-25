@@ -15,6 +15,7 @@ import ar.edu.itba.cryptography.services.BMPIOService;
 import ar.edu.itba.cryptography.services.IOService;
 import ar.edu.itba.cryptography.services.IOService.ExitStatus;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class RetrieveProgram implements MainProgram {
     }
     final String dirString = InputArgsHelper.validateArgAccess(parsedArgs, IMAGES_DIR, false);
     final Optional<String> dir = Optional.ofNullable(dirString);
-    final Path pathToOutput = IOService.createOutputFile(secret);
+    final Path pathToOutput = Paths.get(secret);
     final int k = IOService.parseAsInt(kString, K.getDescription());
     final BMPIOService bmpIOService = new BMPIOService();
     final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, Optional.empty(), INPUT);
