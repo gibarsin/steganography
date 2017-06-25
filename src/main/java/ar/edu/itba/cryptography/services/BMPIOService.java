@@ -157,6 +157,7 @@ public class BMPIOService {
       // Choose only n paths from all the ones found
       for (int i = 0 ; i < n ; i++) {
         final Path path = paths.get(i);
+        IOService.print("Using file: " + path);
         map.put(path, createBmpData(path));
       }
     } else {

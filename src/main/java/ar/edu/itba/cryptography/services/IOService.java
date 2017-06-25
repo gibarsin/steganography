@@ -371,9 +371,12 @@ public class IOService {
     }
   }
 
-
   public static Stream<String> readLines(final Path filePath) {
     return inputFiles.get(filePath);
+  }
+
+  public static void print(final String s) {
+    System.out.println(s);
   }
 
   // private methods
