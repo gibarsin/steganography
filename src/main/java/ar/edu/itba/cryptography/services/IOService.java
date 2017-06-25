@@ -10,11 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -193,7 +189,21 @@ public class IOService {
     return createFile(Paths.get(destFolder, file), data);
   }
 
-  private static Path createFile(final Path pathToFile, final String data) {
+  /**
+   * Creates the specified {@code pathToFile} file and saves the specified {@code data} on it.
+   * <P>
+   * If the file exists, it tries to delete it first.
+   * <P>
+   * If anything fails during these operations, program is aborted with a
+   * detail log and display message, and the corresponding exit status code.
+   * <P>
+   * Note that it is not necessary to close this file, although closing it does not cause any
+   * damage.
+   * @param pathToFile path to the new file
+   * @param data data to be saved on the new file
+   * @return the path to the just created file
+   */
+  public static Path createFile(final Path pathToFile, final String data) {
     final Path destFolder = pathToFile.normalize().getParent();
     if (destFolder != null) {
       final File dataFolder = new File(destFolder.toString());

@@ -2,6 +2,7 @@ package ar.edu.itba.cryptography.services;
 
 import static ar.edu.itba.cryptography.services.IOService.exit;
 
+import ar.edu.itba.cryptography.helpers.ByteHelper;
 import ar.edu.itba.cryptography.services.IOService.ExitStatus;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -108,7 +109,27 @@ public class BMPIOService {
     return chooseMapBasedOn(mode).get(shadowsPaths.get(FIRST_ELEM_INDEX)).getSeed();
   }
 
+  public byte[] getDataBytes(final Path pathToSecret, final OpenMode mode) {
+    return chooseMapBasedOn(mode).get(pathToSecret).getDataBytes();
+  }
+
+  public void storeSecretDataInto(final List<Path> pathsToShadows, final OpenMode mode,
+      final char seed) {
+    final Map<Path, BMPData> map = chooseMapBasedOn(mode);
+    for (char i = 0 ; i < pathsToShadows.size() ; i++) {
+      final Path path = pathsToShadows.get(i);
+      final BMPData bmpData = map.get(path);
+      bmpData.setShadowNumber(i);
+      bmpData.setSeed(seed);
+      writeToDisk(path, bmpData.getBmp());
+    }
+  }
+
   // private methods
+
+  private void writeToDisk(final Path path, final byte[] bmp) {
+    IOService.createFile(path, ByteHelper.hexadecimalBytesToString(bmp).toString());
+  }
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   private void loadPathsBasedOn(final OpenMode mode, final Optional<Integer> optionalN,
@@ -154,17 +175,26 @@ public class BMPIOService {
       return this.bmp;
     }
 
-    /* package-private */ int getNext8BytesOffset() {
-      final int aux = this.nextByte;
-      this.nextByte += 8; // 8 bytes will be consumed if this method is called
-      return aux;
-    }
-
     /* package-private */ byte[] getHeaderBytes() {
       final int offset = BMPService.getBitmapOffset(bmp);
       final byte[] header = new byte[offset];
       System.arraycopy(bmp, FIRST_ELEM_INDEX, header, FIRST_ELEM_INDEX, offset);
       return header;
+    }
+
+    /* package-private */ byte[] getDataBytes() {
+      final int totalSize = BMPService.getBitmapSize(bmp);
+      final int offset = BMPService.getBitmapOffset(bmp);
+      final int dataSize = totalSize - offset;
+      final byte[] data = new byte[dataSize];
+      System.arraycopy(bmp, offset, data, FIRST_ELEM_INDEX, dataSize);
+      return data;
+    }
+
+    /* package-private */ int getNext8BytesOffset() {
+      final int aux = this.nextByte;
+      this.nextByte += 8; // 8 bytes will be consumed if this method is called
+      return aux;
     }
 
     /* package-private */ void setMatrixRow(final int matrixIndex) {
@@ -177,6 +207,14 @@ public class BMPIOService {
 
     /* package-private */ char getSeed() {
       return BMPService.recoverSeed(this.bmp);
+    }
+
+    /* package-private */ void setShadowNumber(final char shadowNumber) {
+      BMPService.saveShadowNumber(bmp, shadowNumber);
+    }
+
+    /* package-private */ void setSeed(final char seed) {
+      BMPService.saveSeed(bmp, seed);
     }
   }
 }
