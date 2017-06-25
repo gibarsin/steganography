@@ -1,5 +1,6 @@
 package ar.edu.itba.cryptography.main_programs.programs.distribute;
 
+import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.INPUT;
 import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.OUTPUT;
 import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
+  private static final int SHADOW_BYTES_PER_SECRET_BYTE = 8;
   private static final int FIRST_ELEM_INDEX = 0;
   private static final int MODULUS = 257;
 
@@ -31,12 +33,8 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
     // Note: 'obf' stands for 'obfuscated'
     // Get the secret bytes
     final byte[] data = getSecretBytes(bmpIOService, pathToSecret);
-    // Validate (with exit code error, if any) the given k according to the data size
-    if (data.length < k ||  data.length % k != 0) {
-      IOService.exit(VALIDATION_FAILED, "It should happen that secret.length >= k "
-          + "&& secret.length % k == 0. Current values: secret.length = " + data.length + "; k = ");
-      throw new IllegalStateException(); // Should never reach here
-    }
+    // Validate all parameter (with exit code error, if any) according to the given secret data
+    validateParameters(bmpIOService, pathsToShadows, k, data);
     // Generate a seed for the obfuscation
     final char seed = ObfuscatorHelper.generateSeed();
     // Obfuscate the data bytes using the generated seed
@@ -48,6 +46,31 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
     distributeData(bmpIOService, obfData, pathsToShadows, matrixA, k, MODULUS);
     // Save the seed and persist the updated data (seed + shadowNumber + secretBytes) in all shadows
     saveSeedAndOverwriteShadows(bmpIOService, pathsToShadows, seed);
+  }
+
+  private void validateParameters(final BMPIOService bmpIOService,
+      final List<Path> pathsToShadows, final int k, final byte[] data) {
+    final int length = data.length;
+    // Validate that the secret data length can be divided into chunks of size k
+    if (length < k ||  length % k != 0) {
+      IOService.exit(VALIDATION_FAILED, "It should happen that secret.length >= k "
+          + "&& secret.length % k == 0. Current values: secret.length = " + length + "; k = ");
+      throw new IllegalStateException(); // Should never reach here
+    }
+    // Validate that the secret data fits in each of the given shadows
+    for (final Path path : pathsToShadows) {
+      final int shadowDataSize = bmpIOService.getDataSize(path, OUTPUT);
+      if (!secretFitsInShadow(length, shadowDataSize, k)) {
+        IOService.exit(VALIDATION_FAILED, "It should happen that 'shadowDataSize >= secretSize * "
+            + SHADOW_BYTES_PER_SECRET_BYTE + " / k'. Current values: secretSize = " + length
+            + "; shadowDataSize = " + shadowDataSize + "; k = " + k);
+      }
+    }
+  }
+
+  private boolean secretFitsInShadow(final int secretSize, final int shadowDataSize,
+      final int k) {
+    return shadowDataSize >= secretSize * SHADOW_BYTES_PER_SECRET_BYTE / k;
   }
 
   private void saveSeedAndOverwriteShadows(final BMPIOService bmpIOService,

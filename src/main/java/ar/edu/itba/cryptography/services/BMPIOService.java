@@ -5,7 +5,6 @@ import static ar.edu.itba.cryptography.services.IOService.ExitStatus.BAD_FILE_FO
 import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 import static ar.edu.itba.cryptography.services.IOService.exit;
 
-import ar.edu.itba.cryptography.helpers.ByteHelper;
 import ar.edu.itba.cryptography.services.IOService.ExitStatus;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -116,6 +115,9 @@ public class BMPIOService {
     return chooseMapBasedOn(mode).get(pathToSecret).getDataBytes();
   }
 
+  public int getDataSize(final Path path, final OpenMode mode) {
+    return chooseMapBasedOn(mode).get(path).getDataSize();
+  }
 
   public byte[] getBmp(final Path path, final OpenMode mode) {
     return chooseMapBasedOn(mode).get(path).getBmp();
@@ -247,6 +249,12 @@ public class BMPIOService {
 
     /* package-private */ void setSeed(final char seed) {
       BMPService.saveSeed(bmp, seed);
+    }
+
+    /* package-private */ int getDataSize() {
+      final int totalSize = BMPService.getBitmapSize(bmp);
+      final int offset = BMPService.getBitmapOffset(bmp);
+      return totalSize - offset;
     }
   }
 }
