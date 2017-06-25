@@ -17,7 +17,7 @@ public class InputArgsHelper {
     SECRET("-secret", "</path/to/image>"),
     K("-k", "<number>"),
     N("-n", "<number>"),
-    IMAGES_DIR("-dir", "<images_directory");
+    IMAGES_DIR("-dir", "<images_directory>");
 
     private final String type;
     private final String description;
