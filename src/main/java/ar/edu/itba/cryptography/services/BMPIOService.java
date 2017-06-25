@@ -113,6 +113,11 @@ public class BMPIOService {
     return chooseMapBasedOn(mode).get(pathToSecret).getDataBytes();
   }
 
+
+  public byte[] getBmp(final Path path, final OpenMode mode) {
+    return chooseMapBasedOn(mode).get(path).getBmp();
+  }
+
   public void setShadowNumber(final Path path, final OpenMode mode, final char x) {
     chooseMapBasedOn(mode).get(path).setShadowNumber(x);
   }
