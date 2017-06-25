@@ -49,9 +49,9 @@ public abstract class MatrixHelper {
    * @return x^{k-1-col} mod (n) as explained above
    */
   public static byte calculateMatrixXTerm(final int x, final int k, final int col, final int n) {
-    int xTerm = x;
+    int xTerm = 1;
     for (int exp = k - 1 - col ; exp > 0 ; exp--) {
-      xTerm *= xTerm;
+      xTerm *= x;
       xTerm %= n;
     }
     return ByteHelper.intToByte(xTerm);
