@@ -79,7 +79,7 @@ import org.apache.commons.lang3.ArrayUtils;
           ak-1, ak-2, ..., a1, a0, but, following the paper, they should be retrieved as:
           a0, a1, ..., ak-2, ak-1
        */
-      xAsBytes[length - 1 - i] = ByteHelper.intToByte(x[i]);
+      xAsBytes[i] = ByteHelper.intToByte(x[i]);
     }
     return xAsBytes;
   }
@@ -109,8 +109,7 @@ import org.apache.commons.lang3.ArrayUtils;
       bmpIOService.setPathMatrixRow(path, INPUT, row);
       final int x = bmpIOService.getShadowNumber(path, INPUT);
       for (int col = 0 ; col < k ; col ++) {
-        matrix[row][col] =
-            ByteHelper.byteToUnsignedInt(MatrixHelper.calculateMatrixXTerm(x, k, col, modulus));
+        matrix[row][col] = MatrixHelper.getCoefficient(x, col, modulus);
       }
     }
     return matrix;

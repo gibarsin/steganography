@@ -59,6 +59,17 @@ public abstract class MatrixHelper {
     return ByteHelper.intToByte(xTerm);
   }
 
+  public static int getCoefficient(final int x, final int coefficientPos, final int modulus) {
+    int coefficient = 1;
+
+    for (int i = coefficientPos; i > 0; i--) {
+      coefficient *= x;
+      coefficient %= modulus;
+    }
+
+    return coefficient;
+  }
+
   /**
    * Solves matrixA x arrayX (mod `mod`) without byte overflow.<p>
    * If byte overflow is detected after applying the mod n in any operation, null is returned.
