@@ -30,7 +30,7 @@ public class BMPIOService {
   }
   private static final String CWD = System.getProperty("user.dir");
   private static final int FIRST_ELEM_INDEX = 0;
-  private static final String BMP_EXT = "glob:*.bmp";
+  private static final String BMP_EXT = "glob:**.bmp";
   private static final PathMatcher bmpExtMatcher = FileSystems.getDefault().getPathMatcher(BMP_EXT);
 
   private final Map<Path, BMPData> inputFiles;
