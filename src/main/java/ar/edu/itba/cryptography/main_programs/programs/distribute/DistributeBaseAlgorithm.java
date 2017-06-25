@@ -54,7 +54,7 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
     // Validate that the secret data length can be divided into chunks of size k
     if (length < k ||  length % k != 0) {
       IOService.exit(VALIDATION_FAILED, "It should happen that secret.length >= k "
-          + "&& secret.length % k == 0. Current values: secret.length = " + length + "; k = ");
+          + "&& secret.length % k == 0. Current values: secret.length = " + length + "; k = " + k);
       throw new IllegalStateException(); // Should never reach here
     }
     // Validate that the secret data fits in each of the given shadows
