@@ -37,11 +37,10 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
     // Generate the matrix A containing all the exponential evaluations of each shadow number
     // Also, assign each shadow a shadow number according to its position in the constructed matrix
     final int[][] matrixA = initializeMatrix(bmpIOService, pathsToShadows, k, MODULUS);
-    // Save the seed in all shadows and persist the new shadow number and seed information
-    saveSeedAndOverwriteShadows(bmpIOService, pathsToShadows, seed);
     // Distribute the obfuscated data into the shadows in chunks of k bytes using the built matrix
     distributeData(bmpIOService, obfData, pathsToShadows, matrixA, k, MODULUS);
-    // TODO: save all shadows with updated data (seed + shadowNumber + secretBytes)
+    // Save the seed and persist the updated data (seed + shadowNumber + secretBytes) in all shadows
+    saveSeedAndOverwriteShadows(bmpIOService, pathsToShadows, seed);
   }
 
   private void saveSeedAndOverwriteShadows(final BMPIOService bmpIOService,
@@ -53,7 +52,7 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
   }
 
   private void distributeData(final BMPIOService bmpIOService, final byte[] obfData,
-      final List<Path> pathsToShadows, final int[][] matrixA, final int k, final int modulus) { // TODO
+      final List<Path> pathsToShadows, final int[][] matrixA, final int k, final int modulus) {
     // If we are here, we know that obfData.length % k == 0
     // Take chunks of k bytes from obfData to build and solve each polynomial, until all
     // obfData bytes have been distributed
@@ -62,8 +61,7 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
       final byte[] arrayX = getNextKBytes(obfData, distributedBytes, k);
       // Resolve the polynomial for all shadow numbers, i.e., perform Ax = b = P([1,n]), with
       // n the max shadow number, taking int account the modulus arithmetic
-      final byte[] arrayB =
-          resolvePolynomialForAllShadowNumbers(matrixA, arrayX, modulus);
+      final byte[] arrayB = resolvePolynomialForAllShadowNumbers(matrixA, arrayX, modulus);
       // Distribute each polynomial evaluation to its corresponding shadow
       distributePolynomialEvaluations(arrayB, bmpIOService, pathsToShadows);
     }
