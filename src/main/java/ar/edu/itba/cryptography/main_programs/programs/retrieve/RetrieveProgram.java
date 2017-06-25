@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RetrieveProgram implements MainProgram {
-  private static final int MODULUS = 257;
   private static final int STANDARD_K_VALUE = 8;
 
   private final Path pathToOutput;
@@ -51,7 +50,7 @@ public class RetrieveProgram implements MainProgram {
   public void run() {
     // Choose the retrieve algorithm based on the k number
     final RetrieveAlgorithm algorithm = chooseRetrieveAlgorithm(this.k);
-    final String bmpAsString = algorithm.run(this.bmpIOService, this.pathsToShadows, MODULUS);
+    final String bmpAsString = algorithm.run(this.bmpIOService, this.pathsToShadows);
     IOService.appendToFile(this.pathToOutput, bmpAsString);
     // Close the output path resources
     IOService.closeOutputFile(this.pathToOutput);
