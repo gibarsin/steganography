@@ -33,7 +33,7 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
     // Get the secret bytes
     final byte[] data = getSecretBytes(bmpIOService, pathToSecret);
     // Validate all parameter (with exit code error, if any) according to the given secret data
-    validateParameters(bmpIOService, pathsToShadows, k, data);
+    validateParameters(bmpIOService, pathsToShadows, k, data, pathToSecret);
     // Generate a seed for the obfuscation
     final char seed = ObfuscatorHelper.generateSeed();
     // Obfuscate the data bytes using the generated seed
@@ -47,8 +47,9 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
     saveSeedAndOverwriteShadows(bmpIOService, pathsToShadows, seed);
   }
 
-  private void validateParameters(final BMPIOService bmpIOService,
-      final List<Path> pathsToShadows, final int k, final byte[] data) {
+  /* package-private */ void validateParameters(final BMPIOService bmpIOService,
+      final List<Path> pathsToShadows, final int k, final byte[] data,
+      final Path pathToSecret) {
     final int length = data.length;
     // Validate that the secret data length can be divided into chunks of size k
     if (length < k ||  length % k != 0) {

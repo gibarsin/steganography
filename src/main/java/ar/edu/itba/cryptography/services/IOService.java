@@ -69,6 +69,11 @@ public class IOService {
     WRITE_FILE_ERROR(-11,
         "[FAIL] - An unexpected IO Exception occurred while writing the file. Caused by: ",
         "[FAIL] -  An unexpected IO Exception occurred while writing a file." + CHECK_LOGS),
+    K8_MISMATCHING_SIZE(-12,
+        "[FAIL] - There is a shadow file that has not the same dimensions (width or height)"
+            + " of the secret file. Shadow path: {}",
+        "[FAIL] - There is a shadow file that has not the same dimensions (width or height)"
+            + " of the secret file." + ABORTING),
     COULD_NOT_OPEN_OUTPUT_FILE(-13,
         "[FAIL] - Could not open output file: {}",
         "[FAIL] - Could not open an output file." + ABORTING),
