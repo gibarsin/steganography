@@ -3,7 +3,6 @@ package ar.edu.itba.cryptography.main_programs.programs.distribute;
 import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.OUTPUT;
 import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 
-import ar.edu.itba.cryptography.helpers.ByteHelper;
 import ar.edu.itba.cryptography.helpers.MatrixHelper;
 import ar.edu.itba.cryptography.helpers.ObfuscatorHelper;
 import ar.edu.itba.cryptography.interfaces.DistributeAlgorithm;
@@ -11,7 +10,6 @@ import ar.edu.itba.cryptography.services.BMPIOService;
 import ar.edu.itba.cryptography.services.IOService;
 import java.nio.file.Path;
 import java.util.List;
-import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
   private static final int FIRST_ELEM_INDEX = 0;
@@ -65,7 +63,7 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
     // Take chunks of k bytes from obfData to build and solve each polynomial, until all
     // obfData bytes have been distributed
     for (int distributedBytes = 0 ; distributedBytes < obfData.length ; distributedBytes += k) {
-      // Get the next k bytes in the order ak-1, ..., a1, a0 (see method comments)
+      // Get the next k bytes in the order a0, a1, ..., ak-1
       final byte[] arrayX = getNextKBytes(obfData, distributedBytes, k);
       // Resolve the polynomial for all shadow numbers, i.e., perform Ax = b = P([1,n]), with
       // n the max shadow number, taking int account the modulus arithmetic
@@ -92,7 +90,7 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
    * is taken over again, until the calculation does not produce overflow. <p>
    * IMPORTANT: this method directly modifies the arrayX
    * @param matrixA the n x k matrix
-   * @param arrayX the k x 1 array, with constants in the order [ak-1, ..., a0].
+   * @param arrayX the k x 1 array, with constants in the order [a0, ..., ak-1].
    *               Recall that it may be modified.
    * @param mod the modulus to be used during calculations
    * @return matrixA x arrayX' (mod n) with arrayX' being the original
@@ -112,9 +110,8 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
   }
 
   private void decrementFirstNonZeroElement(final byte[] arrayX) {
-    // As arrayX is [ak-1, ..., a0], we should be finding this non-zero element
-    // in the inverse order (from the end to the beginning) to strictly obey the paper algorithm
-    for (int i = arrayX.length-1 ; i >= 0 ; i--) {
+    // As arrayX is [a0, ..., ak-1]
+    for (int i = 0; i < arrayX.length ; i++) {
       if (arrayX[i] > 0) {
         arrayX[i] -= ((byte) 1);
         return;
@@ -128,10 +125,6 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
   private byte[] getNextKBytes(final byte[] obfData, final int distributedBytes, final int k) {
     final byte[] arrayX = new byte[k];
     System.arraycopy(obfData, distributedBytes, arrayX, FIRST_ELEM_INDEX, k);
-    // As the paper algorithm suggest us to use the order a0, a1, ... ak-1
-    // instead of ak-1, ..., a1, a0, and we are going to calculate matrixA x arrayX, we need
-    // to reverse the array order to strictly implement the paper algorithm
-    ArrayUtils.reverse(arrayX);
     return arrayX;
   }
 

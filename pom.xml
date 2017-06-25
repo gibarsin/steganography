@@ -20,7 +20,6 @@
     <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
     <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
     <maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
-    <org.apache.commons.commons-lang.version>3.6</org.apache.commons.commons-lang.version>
     <commons-io.version>2.5</commons-io.version>
     <org.slf4j.version>1.7.21</org.slf4j.version>
     <ch.qos.logback.version>1.1.7</ch.qos.logback.version>
@@ -92,13 +91,6 @@
   </build>
 
   <dependencies>
-    <!--Commons Lang 3 (for ArrayUtils.reverse)-->
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>${org.apache.commons.commons-lang.version}</version>
-    </dependency>
-    <!--/Commons Lang 3 (for ArrayUtils.reverse)-->
     <!--Apache Commons IO (write byte[] to file)-->
     <dependency>
       <groupId>commons-io</groupId>

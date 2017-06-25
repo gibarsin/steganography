@@ -8,9 +8,7 @@ import ar.edu.itba.cryptography.helpers.MatrixHelper;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.ArrayUtils;
 
 /*
  * IMPORTANT:
