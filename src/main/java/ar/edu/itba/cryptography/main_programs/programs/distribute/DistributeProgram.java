@@ -46,7 +46,7 @@ public class DistributeProgram implements MainProgram {
     final Optional<Integer> n;
     if (nString != null) {
       n = Optional.of(IOService.parseAsInt(nString, N.getDescription()));
-      // TODO: validate that n < char MAX_VALUE (as it needs to be saved in a 2 byte register)
+      // TODO: validate that n <= char MAX_VALUE (as it needs to be saved in a 2 byte register)
     } else {
       n = Optional.empty();
     }

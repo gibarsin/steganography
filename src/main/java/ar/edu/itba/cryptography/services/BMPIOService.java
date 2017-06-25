@@ -113,23 +113,20 @@ public class BMPIOService {
     return chooseMapBasedOn(mode).get(pathToSecret).getDataBytes();
   }
 
-  public void storeSecretDataInto(final List<Path> pathsToShadows, final OpenMode mode,
-      final char seed) {
-    final Map<Path, BMPData> map = chooseMapBasedOn(mode);
-    for (char i = 0 ; i < pathsToShadows.size() ; i++) {
-      final Path path = pathsToShadows.get(i);
-      final BMPData bmpData = map.get(path);
-      bmpData.setShadowNumber(i);
-      bmpData.setSeed(seed);
-      writeToDisk(path, bmpData.getBmp());
-    }
+  public void setShadowNumber(final Path path, final OpenMode mode, final char x) {
+    chooseMapBasedOn(mode).get(path).setShadowNumber(x);
+  }
+
+  public void setSeed(final Path path, final OpenMode mode, final char seed) {
+    chooseMapBasedOn(mode).get(path).setSeed(seed);
+  }
+
+  public void writeDataToDisk(final Path path, final OpenMode mode) {
+    final byte[] bmp = chooseMapBasedOn(mode).get(path).getBmp();
+    IOService.createFile(path, ByteHelper.hexadecimalBytesToString(bmp));
   }
 
   // private methods
-
-  private void writeToDisk(final Path path, final byte[] bmp) {
-    IOService.createFile(path, ByteHelper.hexadecimalBytesToString(bmp));
-  }
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   private void loadPathsBasedOn(final OpenMode mode, final Optional<Integer> optionalN,
