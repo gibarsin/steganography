@@ -65,7 +65,17 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
       final byte[] arrayB =
           resolvePolynomialForAllShadowNumbers(matrixA, arrayX, modulus);
       // Distribute each polynomial evaluation to its corresponding shadow
-      distributePolynomialEvaluations(arrayB, bmpIOService, pathsToShadows); // TODO
+      distributePolynomialEvaluations(arrayB, bmpIOService, pathsToShadows);
+    }
+  }
+
+  private void distributePolynomialEvaluations(final byte[] arrayB, final BMPIOService bmpIOService,
+      final List<Path> pathsToShadows) {
+    // Save each polynomial evaluation into it's corresponding shadow in a properly manner
+    // (i.e.: as specified by the paper)
+    for (final Path path : pathsToShadows) {
+      final int row = bmpIOService.getPathMatrixRow(path, OUTPUT);
+      bmpIOService.hideByte(path, OUTPUT, arrayB[row]);
     }
   }
 
@@ -145,8 +155,8 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
     for (char row = 0 ; row < n ; row ++) {
       final Path path = shadowsPaths.get(row);
       final char x = (char) (row + 1);
-      bmpIOService.setShadowNumber(path, OUTPUT, x);
-      bmpIOService.setPathMatrixRow(path, OUTPUT, row);
+      bmpIOService.setShadowNumber(path, OUTPUT, x); // set for retrieving purposes only
+      bmpIOService.setPathMatrixRow(path, OUTPUT, row); // set for distribution purposes
       for (int col = 0 ; col < k ; col ++) {
         matrix[row][col] =
             ByteHelper.byteToUnsignedInt(MatrixHelper.calculateMatrixXTerm(x, k, col, modulus));

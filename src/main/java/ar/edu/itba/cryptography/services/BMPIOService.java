@@ -121,6 +121,11 @@ public class BMPIOService {
     chooseMapBasedOn(mode).get(path).setSeed(seed);
   }
 
+  public void hideByte(final Path path, final OpenMode mode, final byte b) {
+    final BMPData bmpData = chooseMapBasedOn(mode).get(path);
+    BMPService.putValueInLSB(bmpData.getBmp(), b, bmpData.getNext8BytesOffset());
+  }
+
   public void writeDataToDisk(final Path path, final OpenMode mode) {
     final byte[] bmp = chooseMapBasedOn(mode).get(path).getBmp();
     IOService.createFile(path, ByteHelper.hexadecimalBytesToString(bmp));
