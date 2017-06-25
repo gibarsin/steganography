@@ -164,8 +164,7 @@ public abstract class DistributeBaseAlgorithm implements DistributeAlgorithm {
       bmpIOService.setShadowNumber(path, OUTPUT, x); // set for retrieving purposes only
       bmpIOService.setPathMatrixRow(path, OUTPUT, row); // set for distribution purposes
       for (int col = 0 ; col < k ; col ++) {
-        matrix[row][col] =
-            ByteHelper.byteToUnsignedInt(MatrixHelper.calculateMatrixXTerm(x, k, col, modulus));
+        matrix[row][col] = MatrixHelper.getCoefficient(x, col, modulus);
       }
     }
     return matrix;

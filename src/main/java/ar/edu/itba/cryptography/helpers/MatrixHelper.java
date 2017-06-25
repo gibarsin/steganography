@@ -44,21 +44,13 @@ public abstract class MatrixHelper {
    *   when solving the equation system), based on the current col position and the given k,
    *   and applying the corresponding modulus arithmetic.
    * </pre>
-   * @param x the shadow x value used to evaluate the polynomial
-   * @param k the total amount of shadows (or, equivalently, the A matrix amount of columns)
-   * @param col the current column for which the x exponential value will be calculated
-   * @param n the modulus used for the modulus arithmetic
-   * @return x^{k-1-col} mod (n) as explained above
+   * // TODO: UPDATE ALL DOCUMENTATION FOR NEW METHOD
+//   * @param x the shadow x value used to evaluate the polynomial
+//   * @param k the total amount of shadows (or, equivalently, the A matrix amount of columns)
+//   * @param col the current column for which the x exponential value will be calculated
+//   * @param n the modulus used for the modulus arithmetic
+//   * @return x^{k-1-col} mod (n) as explained above
    */
-  public static byte calculateMatrixXTerm(final int x, final int k, final int col, final int n) {
-    int xTerm = 1;
-    for (int exp = k - 1 - col ; exp > 0 ; exp--) {
-      xTerm *= x;
-      xTerm %= n;
-    }
-    return ByteHelper.intToByte(xTerm);
-  }
-
   public static int getCoefficient(final int x, final int coefficientPos, final int modulus) {
     int coefficient = 1;
 

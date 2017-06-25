@@ -72,13 +72,7 @@ import org.apache.commons.lang3.ArrayUtils;
   private byte[] solveEquationSystem(final int[][] matrix, final int n) {
     final int[] x = GaussSolverHelper.solve(matrix, n);
     final byte[] xAsBytes = new byte[x.length];
-    final int length = x.length;
-    for (int i = 0 ; i < length ; i++) {
-      /*
-        TODO: check if this reverse: I assume it is needed as bytes are retrieved in the order:
-          ak-1, ak-2, ..., a1, a0, but, following the paper, they should be retrieved as:
-          a0, a1, ..., ak-2, ak-1
-       */
+    for (int i = 0 ; i < x.length ; i++) {
       xAsBytes[i] = ByteHelper.intToByte(x[i]);
     }
     return xAsBytes;
