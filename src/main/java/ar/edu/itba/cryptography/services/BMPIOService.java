@@ -1,5 +1,7 @@
 package ar.edu.itba.cryptography.services;
 
+import static ar.edu.itba.cryptography.services.IOService.ExitStatus.BAD_FILE_DATA;
+import static ar.edu.itba.cryptography.services.IOService.ExitStatus.BAD_FILE_FORMAT;
 import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 import static ar.edu.itba.cryptography.services.IOService.exit;
 
@@ -59,7 +61,7 @@ public class BMPIOService {
   public Path openBmpFile(final String filePathString, final OpenMode mode) {
     final Path pathToFile = Paths.get(filePathString);
     if (!bmpExtMatcher.matches(pathToFile)) {
-      exit(ExitStatus.BAD_FILE_FORMAT, pathToFile);
+      exit(BAD_FILE_FORMAT, pathToFile);
       throw new IllegalStateException(); // Should never return from the above method
     }
     final Map<Path, BMPData> map = chooseMapBasedOn(mode);
@@ -100,7 +102,7 @@ public class BMPIOService {
     return BMPService.recoverShadowNumber(chooseMapBasedOn(mode).get(path).getHeaderBytes());
   }
 
-  public byte getNextSecretByte(final Path path, final OpenMode mode) { // TODO: bad feeling
+  public byte getNextSecretByte(final Path path, final OpenMode mode) {
     // assuming path != null & path opened
     final BMPData bmpData = chooseMapBasedOn(mode).get(path);
     return BMPService.getValueInLSB(bmpData.getBmp(), bmpData.getNext8BytesOffset());
@@ -164,7 +166,7 @@ public class BMPIOService {
   }
 
   private BMPData createBmpData(final Path path) throws IOException {
-    return new BMPData(Files.readAllBytes(path));
+    return BMPData.build(path, Files.readAllBytes(path));
   }
 
   private Map<Path, BMPData> chooseMapBasedOn(final OpenMode mode) {
@@ -179,8 +181,23 @@ public class BMPIOService {
     private int nextByte;
     private int matrixRow;
 
-    /* package-private */ BMPData(final byte[] bmp) {
-      // TODO: validate correct BMP format: bmp file header and size == offset + width * height
+    /* package-private */ static BMPData build(final Path path, final byte[] image) {
+      // validations before initialization
+      if (!BMPService.isBMPFile(image)) {
+        IOService.exit(BAD_FILE_FORMAT, path);
+      }
+      final int size = BMPService.getBitmapSize(image);
+      final int offset = BMPService.getBitmapOffset(image);
+      final int width = BMPService.getHorizontalWidthInPixels(image);
+      final int height = BMPService.getVerticalWidthInPixels(image);
+      if ((size - offset) != (width * height)) {
+        IOService.exit(BAD_FILE_DATA, new Object[] { path, size, offset, width, height});
+      }
+      // If here, all validations passed (recall `exit` aborts the program)
+      return new BMPData(image);
+    }
+
+    private BMPData(final byte[] bmp) {
       this.bmp = bmp;
       this.nextByte = BMPService.getBitmapOffset(bmp);
       this.matrixRow = 0;
