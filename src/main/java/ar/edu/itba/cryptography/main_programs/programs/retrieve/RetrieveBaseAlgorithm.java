@@ -8,6 +8,7 @@ import ar.edu.itba.cryptography.helpers.MatrixHelper;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
 import ar.edu.itba.cryptography.services.BMPIOService;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -52,7 +53,8 @@ import org.apache.commons.lang3.ArrayUtils;
         matrix[shadowNumber][k] = ByteHelper.byteToUnsignedInt(b);
       }
       // Solve the equation system to get the k chunk bytes of current iteration
-      final byte[] kDataByteChunk = solveEquationSystem(matrix, MODULUS);
+      // Make a copy of the current matrix so as not to be modified during the solving
+      final byte[] kDataByteChunk = solveEquationSystem(MatrixHelper.copyOf(matrix), MODULUS);
       if (kDataByteChunk.length != k) throw new IllegalStateException("kDataByteChunk.length != k");
       // Copy the k bytes to the data array
       System.arraycopy(kDataByteChunk, FIRST_ELEM_INDEX, data, i, k);

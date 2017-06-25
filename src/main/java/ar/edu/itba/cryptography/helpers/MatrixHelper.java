@@ -1,5 +1,7 @@
 package ar.edu.itba.cryptography.helpers;
 
+import java.util.Arrays;
+
 public abstract class MatrixHelper {
   private static final int MAX_BYTE = 255;
   /**
@@ -86,5 +88,14 @@ public abstract class MatrixHelper {
       arrayB[i] = (byte) sum; // safe cast (with no overflow)
     }
     return arrayB;
+  }
+
+  public static int[][] copyOf(final int[][] matrix) {
+    final int rows = matrix.length;
+    final int[][] copy = new int[rows][];
+    for (int row = 0 ; row < rows ; row ++) {
+      copy[row] = Arrays.copyOf(matrix[row], matrix[row].length);
+    }
+    return copy;
   }
 }
