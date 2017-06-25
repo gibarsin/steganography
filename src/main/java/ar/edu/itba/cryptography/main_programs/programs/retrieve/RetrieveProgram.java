@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.io.FileUtils;
 
 public class RetrieveProgram implements MainProgram {
   private static final int STANDARD_K_VALUE = 8;
@@ -58,12 +59,10 @@ public class RetrieveProgram implements MainProgram {
   public void run() {
     // Choose the retrieve algorithm based on the k number
     final RetrieveAlgorithm algorithm = chooseRetrieveAlgorithm(this.k);
-    // Get the bmp file data as string
-    final String bmpAsString = algorithm.run(this.bmpIOService, this.pathsToShadows);
+    // Get the bmp file data
+    final byte[] bmp = algorithm.run(this.bmpIOService, this.pathsToShadows); // TODO
     // Write the bmp file to the specified output path
-    IOService.appendToFile(this.pathToOutput, bmpAsString);
-    // Close the output path resources
-    IOService.closeOutputFile(this.pathToOutput);
+    IOService.writeByteArrayToFile(this.pathToOutput, bmp);
     // Close all the shadows files paths
     bmpIOService.closeBmpFiles(this.pathsToShadows, INPUT);
   }

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RetrieveCustomAlgorithm extends RetrieveBaseAlgorithm {
   @Override
-  public String run(final BMPIOService bmpIOService, final List<Path> shadowsPaths) {
+  public byte[] run(final BMPIOService bmpIOService, final List<Path> shadowsPaths) {
     // Note: 'obf' stands for 'obfuscated'
     final int k = shadowsPaths.size();
     // Get the min necessary header information respecting the k size of each chunk
@@ -33,7 +33,7 @@ public class RetrieveCustomAlgorithm extends RetrieveBaseAlgorithm {
     // Remove obfuscation of the full data using the already obtained seed
     final byte[] nonObfFullData = ObfuscatorHelper.toggleObfuscation(obfFullData, seed);
     // Return the secret image bytes as a string
-    return ByteHelper.hexadecimalBytesToString(nonObfFullData);
+    return nonObfFullData;
   }
 
   /**

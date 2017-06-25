@@ -12,5 +12,5 @@ public interface RetrieveAlgorithm {
    *                     There should be k different shadows paths
    * @return the secret, non-obfuscated bmp file data as string
    */
-  String run(BMPIOService bmpIOService, List<Path> shadowsPaths);
+  byte[] run(BMPIOService bmpIOService, List<Path> shadowsPaths);
 }

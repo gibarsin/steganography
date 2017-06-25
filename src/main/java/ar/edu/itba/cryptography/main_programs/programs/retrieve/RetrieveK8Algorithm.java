@@ -11,7 +11,7 @@ import java.util.List;
 
 public class RetrieveK8Algorithm extends RetrieveBaseAlgorithm {
   @Override
-  public String run(final BMPIOService bmpIOService, final List<Path> shadowsPaths) {
+  public byte[] run(final BMPIOService bmpIOService, final List<Path> shadowsPaths) {
     // Retrieve the secret image header
     final byte[] header = retrieveHeader(bmpIOService, shadowsPaths);
     // Get the total data bytes to be retrieved (size - offset)
@@ -23,9 +23,8 @@ public class RetrieveK8Algorithm extends RetrieveBaseAlgorithm {
     // Remove obfuscation
     final int seed = BMPService.recoverSeed(header);
     final byte[] originalData = ObfuscatorHelper.toggleObfuscation(obfuscatedData, seed);
-    // Write the retrieved secret (header + data) into the specified output path
-    return ByteHelper.hexadecimalBytesToString(header) +
-        ByteHelper.hexadecimalBytesToString(originalData);
+    // Return the retrieved secret (header + data)
+    return ByteHelper.merge(header, originalData);
   }
 
   private byte[] retrieveHeader(final BMPIOService bmpIOService,

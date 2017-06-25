@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,14 @@ public class IOService {
 
   private static final Map<Path, BufferedWriter> outputFiles = new HashMap<>();
   private static final Map<Path, Stream<String>> inputFiles = new HashMap<>();
+
+  public static void writeByteArrayToFile(final Path pathToOutput, final byte[] bytes) {
+    try {
+      FileUtils.writeByteArrayToFile(pathToOutput.toFile(), bytes);
+    } catch (IOException e) {
+      exit(WRITE_FILE_ERROR, e);
+    }
+  }
 
   // Exit Codes
   public enum ExitStatus {
