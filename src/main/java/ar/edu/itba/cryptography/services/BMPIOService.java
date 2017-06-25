@@ -1,5 +1,6 @@
 package ar.edu.itba.cryptography.services;
 
+import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 import static ar.edu.itba.cryptography.services.IOService.exit;
 
 import ar.edu.itba.cryptography.helpers.ByteHelper;
@@ -144,11 +145,18 @@ public class BMPIOService {
     final Map<Path, BMPData> map = chooseMapBasedOn(mode);
     if (optionalN.isPresent()) {
       final int n = optionalN.get();
+      if (n > paths.size()) {
+        IOService.exit(VALIDATION_FAILED, "n is greater than the number of shadow images "
+            + "in the specified dir");
+        throw new IllegalStateException(); // Should never return from the above method
+      }
+      // Choose only n paths from all the ones found
       for (int i = 0 ; i < n ; i++) {
         final Path path = paths.get(i);
         map.put(path, createBmpData(path));
       }
     } else {
+      // Use all paths found
       for (final Path path : paths) {
         map.put(path, createBmpData(path));
       }

@@ -22,6 +22,7 @@ import java.util.Optional;
 
 public class RetrieveProgram implements MainProgram {
   private static final int STANDARD_K_VALUE = 8;
+  private static final int MIN_K_VALUE = 2;
 
   private final Path pathToOutput;
   private final int k;
@@ -48,6 +49,7 @@ public class RetrieveProgram implements MainProgram {
     final int k = IOService.parseAsInt(kString, K.getDescription());
     final BMPIOService bmpIOService = new BMPIOService();
     final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, Optional.empty(), INPUT);
+    if (k < MIN_K_VALUE) IOService.exit(VALIDATION_FAILED, "k < " + MIN_K_VALUE);
     if (k != pathsToShadows.size()) IOService.exit(VALIDATION_FAILED, "k != pathsToShadows.size()");
     return new RetrieveProgram(pathToOutput, k, pathsToShadows, bmpIOService);
   }
