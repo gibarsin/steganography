@@ -77,7 +77,7 @@ public abstract class MatrixHelper {
       int sum = 0;
       for (int j = 0 ; j < cols ; j++) {
         // it is assumed that cols(matrixA) = cols
-        sum += (matrixA[i][j] * arrayX[j]);
+        sum += (matrixA[i][j] * ByteHelper.byteToUnsignedInt(arrayX[j]));
         sum %= mod; // perform mod operation on each step
       }
       if (sum > MAX_BYTE) { // byte overflow detected

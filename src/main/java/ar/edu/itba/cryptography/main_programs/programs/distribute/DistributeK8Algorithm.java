@@ -41,6 +41,7 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
     saveSeedAndOverwriteShadows(bmpIOService, pathsToShadows, seed);
     // Distribute the obfuscated data into the shadows in chunks of k bytes using the built matrix
     distributeData(bmpIOService, obfData, pathsToShadows, matrixA, k, MODULUS);
+    // TODO: save all shadows with updated data (seed + shadowNumber + secretBytes)
   }
 
   private void saveSeedAndOverwriteShadows(final BMPIOService bmpIOService,
@@ -62,7 +63,7 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
       // Resolve the polynomial for all shadow numbers, i.e., perform Ax = b = P([1,n]), with
       // n the max shadow number, taking int account the modulus arithmetic
       final byte[] arrayB =
-          resolvePolynomialForAllShadowNumbers(matrixA, arrayX, modulus); // TODO
+          resolvePolynomialForAllShadowNumbers(matrixA, arrayX, modulus);
       // Distribute each polynomial evaluation to its corresponding shadow
       distributePolynomialEvaluations(arrayB, bmpIOService, pathsToShadows); // TODO
     }
@@ -86,13 +87,26 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
       final int mod) {
     byte[] arrayB;
     while (true) {
-      arrayB = MatrixHelper.byteNoOverflowMultiply(matrixA, arrayX, mod); // TODO
+      arrayB = MatrixHelper.byteNoOverflowMultiply(matrixA, arrayX, mod);
       if (arrayB != null) {
         return arrayB;
       }
-      decrementFirstNonZeroElement(arrayX); // TODO
+      decrementFirstNonZeroElement(arrayX);
     }
-    return arrayB;
+  }
+
+  private void decrementFirstNonZeroElement(final byte[] arrayX) {
+    // As arrayX is [ak-1, ..., a0], we should be finding this non-zero element
+    // in the inverse order (from the end to the beginning) to strictly obey the paper algorithm
+    for (int i = arrayX.length-1 ; i >= 0 ; i--) {
+      if (arrayX[i] > 0) {
+        arrayX[i] -= ((byte) 1);
+        return;
+      }
+    }
+    // If this method was called, any byte in the array should have been greater than 0 (as
+    // demonstrated in the paper)
+    throw new IllegalStateException("decrementFirstNonZeroElement hasn't found a non-zero elem");
   }
 
   private byte[] getNextKBytes(final byte[] obfData, final int distributedBytes, final int k) {
