@@ -10,6 +10,7 @@ import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_
 
 import ar.edu.itba.cryptography.helpers.InputArgsHelper;
 import ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs;
+import ar.edu.itba.cryptography.interfaces.DistributeAlgorithm;
 import ar.edu.itba.cryptography.interfaces.MainProgram;
 import ar.edu.itba.cryptography.services.BMPIOService;
 import ar.edu.itba.cryptography.services.IOService;
@@ -18,15 +19,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class DistributionProgram implements MainProgram {
-  private final Path pathToInput;
+public class DistributeProgram implements MainProgram {
+  private static final int STANDARD_K_VALUE = 8;
+
+  private final Path pathToSecret;
   private final int k;
   private final List<Path> pathsToShadows;
   private final BMPIOService bmpIOService;
 
-  private DistributionProgram(final Path pathToInput, final int k,
+  private DistributeProgram(final Path pathToSecret, final int k,
       final List<Path> pathsToShadows, final BMPIOService bmpIOService) {
-    this.pathToInput = pathToInput;
+    this.pathToSecret = pathToSecret;
     this.k = k;
     this.pathsToShadows = pathsToShadows;
     this.bmpIOService = bmpIOService;
@@ -52,11 +55,25 @@ public class DistributionProgram implements MainProgram {
       IOService.exit(VALIDATION_FAILED, "n != pathsToShadows.size()");
       throw new IllegalStateException(); // Should never return from the above method
     }
-    return new DistributionProgram(pathToInput, k, pathsToShadows, bmpIOService);
+    return new DistributeProgram(pathToInput, k, pathsToShadows, bmpIOService);
   }
 
   @Override
-  public void run() {
-    // TODO
+  public void run() { // TODO
+    // Choose the distribute algorithm based on the k number
+    final DistributeAlgorithm algorithm = chooseDistributeAlgorithm(this.k);
+    // Distribute the secret among all the shadows using the correct algorithm
+    algorithm.run(this.bmpIOService, this.pathToSecret, this.pathsToShadows); // TODO
+    // Close the secret file path
+    bmpIOService.closeBmpFile(this.pathToSecret, INPUT);
+    // Close all the shadows files paths
+    bmpIOService.closeBmpFiles(this.pathsToShadows, OUTPUT);
+  }
+
+  private DistributeAlgorithm chooseDistributeAlgorithm(final int k) {
+    if (k == STANDARD_K_VALUE) {
+      return new DistributeK8Algorithm();
+    }
+    return new DistributeCustomAlgorithm();
   }
 }

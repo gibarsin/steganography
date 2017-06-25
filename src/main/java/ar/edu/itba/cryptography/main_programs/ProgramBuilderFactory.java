@@ -1,7 +1,7 @@
 package ar.edu.itba.cryptography.main_programs;
 
 import ar.edu.itba.cryptography.interfaces.MainProgramBuilder;
-import ar.edu.itba.cryptography.main_programs.programs.distribute.DistributionProgram;
+import ar.edu.itba.cryptography.main_programs.programs.distribute.DistributeProgram;
 import ar.edu.itba.cryptography.main_programs.programs.HelpProgram;
 import ar.edu.itba.cryptography.main_programs.programs.retrieve.RetrieveProgram;
 
@@ -16,7 +16,7 @@ public abstract class ProgramBuilderFactory {
   }
 
   public static MainProgramBuilder distProgramBuilder() {
-    return DistributionProgram::build;
+    return DistributeProgram::build;
   }
 
   public static MainProgramBuilder retrieveProgramBuilder() {

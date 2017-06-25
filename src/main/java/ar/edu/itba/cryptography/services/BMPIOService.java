@@ -77,6 +77,10 @@ public class BMPIOService {
     }
   }
 
+  public void closeBmpFile(final Path path, final OpenMode mode) {
+    chooseMapBasedOn(mode).remove(path);
+  }
+
   public byte[] getHeaderBytesOf(final Path path, final OpenMode mode) {
     return chooseMapBasedOn(mode).get(path).getHeaderBytes(); // assuming path != null & path opened
   }
