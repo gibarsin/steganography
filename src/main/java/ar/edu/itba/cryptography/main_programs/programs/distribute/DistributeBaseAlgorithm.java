@@ -1,6 +1,5 @@
 package ar.edu.itba.cryptography.main_programs.programs.distribute;
 
-import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.INPUT;
 import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.OUTPUT;
 import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 
