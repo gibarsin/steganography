@@ -13,12 +13,12 @@ public abstract class ByteHelper {
     return (byte) i;
   }
 
-  public static StringBuilder hexadecimalBytesToString(final byte[] bytes) {
+  public static String hexadecimalBytesToString(final byte[] bytes) {
     final StringBuilder sb = new StringBuilder();
     for (byte aByte : bytes) {
       sb.append(String.format(HEXADECIMAL_FORMAT, aByte));
     }
-    return sb;
+    return sb.toString();
   }
 
   public static byte[] merge(final byte[] bytes1, final byte[] bytes2) {

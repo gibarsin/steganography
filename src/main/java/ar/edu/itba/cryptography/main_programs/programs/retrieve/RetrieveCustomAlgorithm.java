@@ -33,7 +33,7 @@ public class RetrieveCustomAlgorithm extends RetrieveBaseAlgorithm {
     // Remove obfuscation of the full data using the already obtained seed
     final byte[] nonObfFullData = ObfuscatorHelper.toggleObfuscation(obfFullData, seed);
     // Return the secret image bytes as a string
-    return ByteHelper.hexadecimalBytesToString(nonObfFullData).toString();
+    return ByteHelper.hexadecimalBytesToString(nonObfFullData);
   }
 
   /**

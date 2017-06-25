@@ -128,7 +128,7 @@ public class BMPIOService {
   // private methods
 
   private void writeToDisk(final Path path, final byte[] bmp) {
-    IOService.createFile(path, ByteHelper.hexadecimalBytesToString(bmp).toString());
+    IOService.createFile(path, ByteHelper.hexadecimalBytesToString(bmp));
   }
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

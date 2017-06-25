@@ -24,9 +24,8 @@ public class RetrieveK8Algorithm extends RetrieveBaseAlgorithm {
     final int seed = BMPService.recoverSeed(header);
     final byte[] originalData = ObfuscatorHelper.toggleObfuscation(obfuscatedData, seed);
     // Write the retrieved secret (header + data) into the specified output path
-    final StringBuilder bmpFileString = ByteHelper.hexadecimalBytesToString(header);
-    bmpFileString.append(ByteHelper.hexadecimalBytesToString(originalData));
-    return bmpFileString.toString();
+    return ByteHelper.hexadecimalBytesToString(header) +
+        ByteHelper.hexadecimalBytesToString(originalData);
   }
 
   private byte[] retrieveHeader(final BMPIOService bmpIOService,
