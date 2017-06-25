@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface DistributeAlgorithm {
   // TODO: document
-  void run(BMPIOService bmpIOService, Path pathToSecret, List<Path> pathsToShadows);
+  void run(BMPIOService bmpIOService, Path pathToSecret, List<Path> pathsToShadows, int k);
 }

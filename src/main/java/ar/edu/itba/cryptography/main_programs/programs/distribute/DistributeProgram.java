@@ -63,7 +63,7 @@ public class DistributeProgram implements MainProgram {
     // Choose the distribute algorithm based on the k number
     final DistributeAlgorithm algorithm = chooseDistributeAlgorithm(this.k);
     // Distribute the secret among all the shadows using the correct algorithm
-    algorithm.run(this.bmpIOService, this.pathToSecret, this.pathsToShadows); // TODO
+    algorithm.run(this.bmpIOService, this.pathToSecret, this.pathsToShadows, this.k); // TODO
     // Close the secret file path
     bmpIOService.closeBmpFile(this.pathToSecret, INPUT);
     // Close all the shadows files paths

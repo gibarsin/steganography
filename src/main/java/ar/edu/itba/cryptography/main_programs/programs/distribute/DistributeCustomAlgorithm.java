@@ -8,7 +8,7 @@ import java.util.List;
 public class DistributeCustomAlgorithm implements DistributeAlgorithm {
   @Override
   public void run(final BMPIOService bmpIOService, final Path pathToSecret,
-      final List<Path> pathsToShadows) {
+      final List<Path> pathsToShadows, final int k) {
     // TODO
   }
 }
