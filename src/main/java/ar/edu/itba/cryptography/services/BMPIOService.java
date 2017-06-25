@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,12 +44,12 @@ public class BMPIOService {
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   public List<Path> openBmpFilesFrom(final Optional<String> optionalDir,
       final Optional<Integer> optionalN, final OpenMode mode) {
-    final List<Path> paths;
+    List<Path> paths;
     final String dir = optionalDir.orElse(CWD);
     try (final Stream<Path> pathsStream = Files.walk(Paths.get(dir))) {
       paths = pathsStream.filter(path -> Files.isRegularFile(path)
           && bmpExtMatcher.matches(path)).collect(Collectors.toList());
-      loadPathsBasedOn(mode, optionalN, paths);
+      paths = loadPathsBasedOn(mode, optionalN, paths);
     } catch (final IOException e) {
       exit(ExitStatus.COULD_NOT_OPEN_INPUT_FILE, e);
       throw new IllegalStateException(); // Should never return from the above method
@@ -144,7 +145,7 @@ public class BMPIOService {
   // private methods
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-  private void loadPathsBasedOn(final OpenMode mode, final Optional<Integer> optionalN,
+  private List<Path> loadPathsBasedOn(final OpenMode mode, final Optional<Integer> optionalN,
       final List<Path> paths) throws IOException {
     final Map<Path, BMPData> map = chooseMapBasedOn(mode);
     if (optionalN.isPresent()) {
@@ -154,17 +155,21 @@ public class BMPIOService {
             + "in the specified dir");
         throw new IllegalStateException(); // Should never return from the above method
       }
+      final List<Path> inUsePaths = new LinkedList<>();
       // Choose only n paths from all the ones found
       for (int i = 0 ; i < n ; i++) {
         final Path path = paths.get(i);
         IOService.print("Using shadow file: " + path);
         map.put(path, createBmpData(path));
+        inUsePaths.add(path);
       }
+      return inUsePaths;
     } else {
       // Use all paths found
       for (final Path path : paths) {
         map.put(path, createBmpData(path));
       }
+      return paths;
     }
   }
 

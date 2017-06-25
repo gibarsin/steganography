@@ -48,9 +48,9 @@ public class RetrieveProgram implements MainProgram {
     final Path pathToOutput = Paths.get(secret);
     final int k = IOService.parseAsInt(kString, K.getDescription());
     final BMPIOService bmpIOService = new BMPIOService();
-    final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, Optional.empty(), INPUT);
+    final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, Optional.of(k), INPUT);
     if (k < MIN_K_VALUE) IOService.exit(VALIDATION_FAILED, "k < " + MIN_K_VALUE);
-    if (k != pathsToShadows.size()) IOService.exit(VALIDATION_FAILED, "k != pathsToShadows.size()");
+    if (k > pathsToShadows.size()) IOService.exit(VALIDATION_FAILED, "k > pathsToShadows.size()");
     return new RetrieveProgram(pathToOutput, k, pathsToShadows, bmpIOService);
   }
 
