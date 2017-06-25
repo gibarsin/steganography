@@ -53,12 +53,6 @@ import org.apache.commons.lang3.ArrayUtils;
       }
       // Solve the equation system to get the k chunk bytes of current iteration
       final byte[] kDataByteChunk = solveEquationSystem(matrix, MODULUS);
-      /*
-        TODO: check this: I assume it is needed as bytes are retrieved in the order:
-        ak-1, ak-2, ..., a1, a0, but, following the paper, they should be retrieved as:
-          a0, a1, ..., ak-2, ak-1
-       */
-      ArrayUtils.reverse(kDataByteChunk);
       if (kDataByteChunk.length != k) throw new IllegalStateException("kDataByteChunk.length != k");
       // Copy the k bytes to the data array
       System.arraycopy(kDataByteChunk, FIRST_ELEM_INDEX, data, i, k);
@@ -76,8 +70,14 @@ import org.apache.commons.lang3.ArrayUtils;
   private byte[] solveEquationSystem(final int[][] matrix, final int n) {
     final int[] x = GaussSolverHelper.solve(matrix, n);
     final byte[] xAsBytes = new byte[x.length];
-    for (int i = 0 ; i < x.length ; i++) {
-      xAsBytes[i] = ByteHelper.intToByte(x[i]);
+    final int length = x.length;
+    for (int i = 0 ; i < length ; i++) {
+      /*
+        TODO: check if this reverse: I assume it is needed as bytes are retrieved in the order:
+          ak-1, ak-2, ..., a1, a0, but, following the paper, they should be retrieved as:
+          a0, a1, ..., ak-2, ak-1
+       */
+      xAsBytes[length - 1 - i] = ByteHelper.intToByte(x[i]);
     }
     return xAsBytes;
   }
