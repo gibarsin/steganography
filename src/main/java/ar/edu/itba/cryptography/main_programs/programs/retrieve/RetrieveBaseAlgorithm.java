@@ -19,6 +19,22 @@ import java.util.List;
 
   /* package-private */ static final int FIRST_ELEM_INDEX = 0;
 
+  /**
+   * Retrieves dataLength bytes from the shadowPaths shadows (managed through the bmpIOService).
+   * <p>
+   * Note that the bmpIOService handles each shadow's pointers to the next bytes to be
+   * read for each path, and that this action is permanent, i.e., future reads from the same
+   * shadow paths (that weren't closed by the BMPIOService) will keep reading from the
+   * last read offset.
+   * </p>
+   * @param bmpIOService shadowsPath manager
+   * @param shadowsPaths path to each of the shadow files that should be already opened in
+   *                     INPUT mode using the current instance of the bmpIOService.
+   *                     There should be k shadows paths
+   * @param dataLength   the number of secret bytes to be retrieved
+   * @return an array with the obfuscated bytes of the secret image
+   *         being retrieved from the given shadows
+   */
   /* package-private */ byte[] retrieveData(final BMPIOService bmpIOService,
       final List<Path> shadowsPaths, final int dataLength) {
     final int k = shadowsPaths.size();

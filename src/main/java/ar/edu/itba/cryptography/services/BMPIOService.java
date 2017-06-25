@@ -52,6 +52,13 @@ public class BMPIOService {
     return paths;
   }
 
+  public void closeBmpFiles(final List<Path> paths, final OpenMode mode) {
+    final Map<Path, BMPData> map = chooseMapBasedOn(mode);
+    for (final Path path : paths) {
+      map.remove(path);
+    }
+  }
+
   public byte[] getHeaderBytesOf(final Path path, final OpenMode mode) {
     return chooseMapBasedOn(mode).get(path).getHeaderBytes(); // assuming path != null & path opened
   }
@@ -73,6 +80,10 @@ public class BMPIOService {
     // assuming path != null & path opened
     final BMPData bmpData = chooseMapBasedOn(mode).get(path);
     return BMPService.getValueInLSB(bmpData.getBmp(), bmpData.getNext8BytesOffset());
+  }
+
+  public char getSeedFromSample(final List<Path> shadowsPaths, final OpenMode mode) {
+    return chooseMapBasedOn(mode).get(shadowsPaths.get(FIRST_ELEM_INDEX)).getSeed();
   }
 
   // private methods
@@ -122,6 +133,10 @@ public class BMPIOService {
 
     /* package-private */ int getMatrixRow() {
       return this.matrixRow;
+    }
+
+    /* package-private */ char getSeed() {
+      return BMPService.recoverSeed(this.bmp);
     }
   }
 }

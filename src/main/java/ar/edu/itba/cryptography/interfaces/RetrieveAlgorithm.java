@@ -5,7 +5,12 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface RetrieveAlgorithm {
-  // TODO: document
-  // TODO: Somewhere, we have to use the "permutation" seed or sth like that...
+  /**
+   * Runs the retrieve algorithm using the given resources
+   * @param bmpIOService service managing all access & information of the specified shadows paths
+   * @param shadowsPaths the shadows that will be used to retrieve the secret file.
+   *                     There should be k different shadows paths
+   * @return the secret, non-obfuscated bmp file data as string
+   */
   String run(BMPIOService bmpIOService, List<Path> shadowsPaths);
 }

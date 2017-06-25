@@ -50,10 +50,14 @@ public class RetrieveProgram implements MainProgram {
   public void run() {
     // Choose the retrieve algorithm based on the k number
     final RetrieveAlgorithm algorithm = chooseRetrieveAlgorithm(this.k);
+    // Get the bmp file data as string
     final String bmpAsString = algorithm.run(this.bmpIOService, this.pathsToShadows);
+    // Write the bmp file to the specified output path
     IOService.appendToFile(this.pathToOutput, bmpAsString);
     // Close the output path resources
     IOService.closeOutputFile(this.pathToOutput);
+    // Close all the shadows files paths
+    bmpIOService.closeBmpFiles(this.pathsToShadows, OpenMode.INPUT);
   }
 
   private RetrieveAlgorithm chooseRetrieveAlgorithm(final int k) {

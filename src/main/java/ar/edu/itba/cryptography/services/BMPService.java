@@ -7,6 +7,12 @@ import static ar.edu.itba.cryptography.services.BMPService.BMP_OFFSET.*;
  */
 public final class BMPService {
 
+  /**
+   * The minimum header size. It should allow to read the size of the complete file,
+   * for retrieving secret purposes
+   */
+  public static final int MIN_HEADER_SIZE = RESERVED.position;
+
   private static final int BMP_ID = 0x4D42;
 
   /**
