@@ -4,6 +4,7 @@ import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.*;
 import static ar.edu.itba.cryptography.services.IOService.ExitStatus.BAD_ARGUMENT;
 
 import ar.edu.itba.cryptography.services.IOService;
+import ar.edu.itba.cryptography.services.IOService.ExitStatus;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,5 +63,26 @@ public class InputArgsHelper {
       i += 2; // We have just read 2 input args
     }
     return parsedArgs;
+  }
+
+  /**
+   *
+   * @param parsedArgs all the parsed arguments
+   * @param arg the argument to be retrieved, if access is allowed
+   * @param shouldBeDefined true if arg is expected to be != null; false if can be == null
+   * @return the parsed argument value, if access is allowed
+   * @implNote
+   *  null && should => error: missing argument
+   *  null && !should => OK
+   *  !null && should => OK
+   *  !null && !should => OK
+   */
+  public static String validateArgAccess(final Map<InputArgs, String> parsedArgs,
+      final InputArgs arg, final boolean shouldBeDefined) {
+    final String parsedArg = parsedArgs.get(arg);
+    if (parsedArg == null && shouldBeDefined) {
+      IOService.exit(ExitStatus.BAD_ARGUMENT, "Undefined parameter: " + arg.getDescription());
+    }
+    return parsedArg;
   }
 }

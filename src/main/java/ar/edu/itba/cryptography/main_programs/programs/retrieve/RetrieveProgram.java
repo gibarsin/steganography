@@ -4,8 +4,10 @@ import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.IMAGES_
 import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.K;
 import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.N;
 import static ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs.SECRET;
+import static ar.edu.itba.cryptography.services.BMPIOService.OpenMode.INPUT;
 import static ar.edu.itba.cryptography.services.IOService.ExitStatus.VALIDATION_FAILED;
 
+import ar.edu.itba.cryptography.helpers.InputArgsHelper;
 import ar.edu.itba.cryptography.helpers.InputArgsHelper.InputArgs;
 import ar.edu.itba.cryptography.interfaces.MainProgram;
 import ar.edu.itba.cryptography.interfaces.RetrieveAlgorithm;
@@ -16,6 +18,7 @@ import ar.edu.itba.cryptography.services.IOService.ExitStatus;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class RetrieveProgram implements MainProgram {
   private static final int STANDARD_K_VALUE = 8;
@@ -34,14 +37,17 @@ public class RetrieveProgram implements MainProgram {
   }
 
   public static MainProgram build(final Map<InputArgs, String> parsedArgs) {
-    final String secret = validateArgAccess(parsedArgs, SECRET, true);
-    final String kString = validateArgAccess(parsedArgs, K, true);
-    validateArgAccess(parsedArgs, N, false);
-    final String dir = validateArgAccess(parsedArgs, IMAGES_DIR, true);
+    final String secret = InputArgsHelper.validateArgAccess(parsedArgs, SECRET, true);
+    final String kString = InputArgsHelper.validateArgAccess(parsedArgs, K, true);
+    if (InputArgsHelper.validateArgAccess(parsedArgs, N, false) != null) {
+      IOService.exit(ExitStatus.BAD_ARGUMENT, N.getDescription() + "shouldn't be specified");
+    }
+    final String dirString = InputArgsHelper.validateArgAccess(parsedArgs, IMAGES_DIR, false);
+    final Optional<String> dir = Optional.ofNullable(dirString);
     final Path pathToOutput = IOService.createOutputFile(secret);
     final int k = IOService.parseAsInt(kString, K.getDescription());
     final BMPIOService bmpIOService = new BMPIOService();
-    final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, OpenMode.INPUT);
+    final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, Optional.empty(), INPUT);
     if (k != pathsToShadows.size()) IOService.exit(VALIDATION_FAILED, "k != pathsToShadows.size()");
     return new RetrieveProgram(pathToOutput, k, pathsToShadows, bmpIOService);
   }
@@ -57,7 +63,7 @@ public class RetrieveProgram implements MainProgram {
     // Close the output path resources
     IOService.closeOutputFile(this.pathToOutput);
     // Close all the shadows files paths
-    bmpIOService.closeBmpFiles(this.pathsToShadows, OpenMode.INPUT);
+    bmpIOService.closeBmpFiles(this.pathsToShadows, INPUT);
   }
 
   private RetrieveAlgorithm chooseRetrieveAlgorithm(final int k) {
@@ -65,28 +71,5 @@ public class RetrieveProgram implements MainProgram {
       return new RetrieveK8Algorithm();
     }
     return new RetrieveCustomAlgorithm();
-  }
-
-  /**
-   *
-   * @param parsedArgs all the parsed arguments
-   * @param arg the argument to be retrieved, if access is allowed
-   * @param shouldBeDefined true if arg is expected to be != null; false if should be == null
-   * @return the parsed argument value, if access is allowed
-   * @implNote
-   *  null && should => error: missing argument
-   *  null && !should => OK
-   *  !null && should => OK
-   *  !null && !should => error: extra argument
-   */
-  private static String validateArgAccess(final Map<InputArgs, String> parsedArgs,
-      final InputArgs arg, final boolean shouldBeDefined) {
-    final String parsedArg = parsedArgs.get(arg);
-    if (parsedArg == null && shouldBeDefined) {
-      IOService.exit(ExitStatus.BAD_ARGUMENT, "Undefined parameter: " + arg.getDescription());
-    } else if (parsedArg != null && !shouldBeDefined) {
-      IOService.exit(ExitStatus.BAD_ARGUMENT, "Extra defined parameter: " + arg.getDescription());
-    }
-    return parsedArg;
   }
 }

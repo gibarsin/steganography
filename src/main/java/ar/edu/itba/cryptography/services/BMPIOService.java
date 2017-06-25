@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,7 +24,7 @@ public class BMPIOService {
   public enum OpenMode {
     INPUT, OUTPUT
   }
-
+  private static final String CWD = System.getProperty("user.dir");
   private static final int FIRST_ELEM_INDEX = 0;
   private static final String BMP_EXT = "glob:*.bmp";
   private static final PathMatcher bmpExtMatcher = FileSystems.getDefault().getPathMatcher(BMP_EXT);
@@ -36,20 +37,37 @@ public class BMPIOService {
     outputFiles= new HashMap<>();
   }
 
-  public List<Path> openBmpFilesFrom(final String dir, final OpenMode mode) {
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  public List<Path> openBmpFilesFrom(final Optional<String> optionalDir,
+      final Optional<Integer> optionalN, final OpenMode mode) {
     final List<Path> paths;
+    final String dir = optionalDir.orElse(CWD);
     try (final Stream<Path> pathsStream = Files.walk(Paths.get(dir))) {
       paths = pathsStream.filter(path -> Files.isRegularFile(path)
           && bmpExtMatcher.matches(path)).collect(Collectors.toList());
-      final Map<Path, BMPData> map = chooseMapBasedOn(mode);
-      for (final Path path : paths) {
-        map.put(path, createBmpData(path));
-      }
+      loadPathsBasedOn(mode, optionalN, paths);
     } catch (final IOException e) {
       exit(ExitStatus.COULD_NOT_OPEN_INPUT_FILE, e);
       throw new IllegalStateException(); // Should never return from the above method
     }
     return paths;
+  }
+
+
+  public Path openBmpFile(final String filePathString, final OpenMode mode) {
+    final Path pathToFile = Paths.get(filePathString);
+    if (!bmpExtMatcher.matches(pathToFile)) {
+      exit(ExitStatus.BAD_FILE_FORMAT, pathToFile);
+      throw new IllegalStateException(); // Should never return from the above method
+    }
+    final Map<Path, BMPData> map = chooseMapBasedOn(mode);
+    try {
+      map.put(pathToFile, createBmpData(pathToFile));
+    } catch (IOException e) {
+      exit(ExitStatus.COULD_NOT_OPEN_INPUT_FILE, e);
+      throw new IllegalStateException(); // Should never return from the above method
+    }
+    return pathToFile;
   }
 
   public void closeBmpFiles(final List<Path> paths, final OpenMode mode) {
@@ -88,6 +106,23 @@ public class BMPIOService {
 
   // private methods
 
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  private void loadPathsBasedOn(final OpenMode mode, final Optional<Integer> optionalN,
+      final List<Path> paths) throws IOException {
+    final Map<Path, BMPData> map = chooseMapBasedOn(mode);
+    if (optionalN.isPresent()) {
+      final int n = optionalN.get();
+      for (int i = 0 ; i < n ; i++) {
+        final Path path = paths.get(i);
+        map.put(path, createBmpData(path));
+      }
+    } else {
+      for (final Path path : paths) {
+        map.put(path, createBmpData(path));
+      }
+    }
+  }
+
   private BMPData createBmpData(final Path path) throws IOException {
     return new BMPData(Files.readAllBytes(path));
   }
@@ -105,6 +140,7 @@ public class BMPIOService {
     private int matrixRow;
 
     /* package-private */ BMPData(final byte[] bmp) {
+      // TODO: validate correct BMP format: bmp file header and size == offset + width * height
       this.bmp = bmp;
       this.nextByte = BMPService.getBitmapOffset(bmp);
       this.matrixRow = 0;

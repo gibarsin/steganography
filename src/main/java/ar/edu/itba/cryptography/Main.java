@@ -17,7 +17,7 @@ public class Main {
   static {
     mainPrograms = new HashMap<>();
     mainPrograms.put(HELP_PROGRAM.getType(), ProgramBuilderFactory.helpProgramBuilder());
-    mainPrograms.put(DISTRIBUTION_PROGRAM.getType(), ProgramBuilderFactory.distrProgramBuilder());
+    mainPrograms.put(DISTRIBUTION_PROGRAM.getType(), ProgramBuilderFactory.distProgramBuilder());
     mainPrograms.put(RETRIEVE_PROGRAM.getType(), ProgramBuilderFactory.retrieveProgramBuilder());
   }
 
