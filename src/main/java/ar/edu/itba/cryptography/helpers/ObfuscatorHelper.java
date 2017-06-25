@@ -15,7 +15,9 @@ public abstract class ObfuscatorHelper {
     final byte[] permutationTable = createPermutationTable(length, seed);
     final byte[] toggledObfuscationData = new byte[length];
     for (int i = 0 ; i < length ; i ++) {
-      toggledObfuscationData[i] = (byte) (originalData[i] ^ permutationTable[i]);
+      toggledObfuscationData[i] =
+          (byte) (ByteHelper.byteToUnsignedInt(originalData[i]) ^
+              ByteHelper.byteToUnsignedInt(permutationTable[i]));
     }
     return toggledObfuscationData;
   }
