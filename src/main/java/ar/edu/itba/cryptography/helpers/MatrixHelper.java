@@ -1,6 +1,7 @@
 package ar.edu.itba.cryptography.helpers;
 
 public abstract class MatrixHelper {
+  private static final int MAX_BYTE = 255;
   /**
    * <p>
    *   Calculates the x term value of the matrix based on the given parameters. For a better
@@ -54,5 +55,36 @@ public abstract class MatrixHelper {
       xTerm %= n;
     }
     return ByteHelper.intToByte(xTerm);
+  }
+
+  /**
+   * Solves matrixA x arrayX (mod `mod`) without byte overflow.<p>
+   * If byte overflow is detected after applying the mod n in any operation, null is returned.
+   * @param matrixA the n x k matrix
+   * @param arrayX the k x 1 array
+   * @param mod the modulus to be used during calculations
+   * @return matrixA x arrayX (mod n) if no byte overflow is detected; null otherwise
+   * @implNote To check byte overflow, all operations are first carried out with
+   *           integer type variables and then safely casted to byte
+   *           (i.e.: checking there will no be byte overflow if the cast is performed)
+   */
+  public static byte[] byteNoOverflowMultiply(final int[][] matrixA, final byte[] arrayX,
+      final int mod) {
+    final int rows = matrixA.length;
+    final int cols = arrayX.length;
+    final byte[] arrayB = new byte[rows];
+    for (int i = 0 ; i < rows ; i++) {
+      int sum = 0;
+      for (int j = 0 ; j < cols ; j++) {
+        // it is assumed that cols(matrixA) = cols
+        sum += (matrixA[i][j] * arrayX[j]);
+        sum %= mod; // perform mod operation on each step
+      }
+      if (sum > MAX_BYTE) { // byte overflow detected
+        return null;
+      }
+      arrayB[i] = (byte) sum; // safe cast (with no overflow)
+    }
+    return arrayB;
   }
 }
