@@ -12,6 +12,7 @@ import ar.edu.itba.cryptography.services.BMPIOService;
 import ar.edu.itba.cryptography.services.IOService;
 import java.nio.file.Path;
 import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class DistributeK8Algorithm implements DistributeAlgorithm {
   private static final int FIRST_ELEM_INDEX = 0;
@@ -56,7 +57,7 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
     // Take chunks of k bytes from obfData to build and solve each polynomial, until all
     // obfData bytes have been distributed
     for (int distributedBytes = 0 ; distributedBytes < obfData.length ; distributedBytes += k) {
-      // Get the next k bytes in the order ak-1, ..., a1, a0 (see method documentation)
+      // Get the next k bytes in the order ak-1, ..., a1, a0 (see method comments)
       final byte[] arrayX = getNextKBytes(obfData, distributedBytes, k);
       // Resolve the polynomial for all shadow numbers, i.e., perform Ax = b = P([1,n]), with
       // n the max shadow number, taking int account the modulus arithmetic
@@ -68,12 +69,13 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
   }
 
   private byte[] getNextKBytes(final byte[] obfData, final int distributedBytes, final int k) {
-    final byte[] originalArrayX = new byte[k];
-    System.arraycopy(obfData, distributedBytes, originalArrayX, FIRST_ELEM_INDEX, k);
+    final byte[] arrayX = new byte[k];
+    System.arraycopy(obfData, distributedBytes, arrayX, FIRST_ELEM_INDEX, k);
     // As the paper algorithm suggest us to use the order a0, a1, ... ak-1
     // instead of ak-1, ..., a1, a0, and we are going to calculate matrixA x arrayX, we need
     // to reverse the array order to strictly implement the paper algorithm
-    return reverseArray(originalArrayX); // TODO
+    ArrayUtils.reverse(arrayX);
+    return arrayX;
   }
 
   /**
