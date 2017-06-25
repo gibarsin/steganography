@@ -68,6 +68,33 @@ public class DistributeK8Algorithm implements DistributeAlgorithm {
     }
   }
 
+  /**
+   * Solves matrixA x arrayX (mod n) without byte overflow.<p>
+   * If overflow is detected during the operation,
+   * the first non-zero element (from a0, to ak-1) in arrayX is decremented by one and calculation
+   * is taken over again, until the calculation does not produce overflow. <p>
+   * IMPORTANT: this method directly modifies the arrayX
+   * @param matrixA the n x k matrix
+   * @param arrayX the k x 1 array, with constants in the order [ak-1, ..., a0].
+   *               Recall that it may be modified.
+   * @param n the modulus to be used during calculations
+   * @return matrixA x arrayX' (mod n) with arrayX' being the original
+   *         arrayX or a modification of it such that the specified multiplication
+   *         does not produce byte overflow while it's being calculated
+   */
+  private byte[] resolvePolynomialForAllShadowNumbers(final int[][] matrixA, final byte[] arrayX,
+      final int n) {
+    byte[] arrayB;
+    while (true) {
+      arrayB = MatrixHelper.byteNoOverflowMultiply(matrixA, arrayX, n); // TODO
+      if (arrayB != null) {
+        return arrayB;
+      }
+      decrementFirstNonZeroElement(arrayX); // TODO
+    }
+    return arrayB;
+  }
+
   private byte[] getNextKBytes(final byte[] obfData, final int distributedBytes, final int k) {
     final byte[] arrayX = new byte[k];
     System.arraycopy(obfData, distributedBytes, arrayX, FIRST_ELEM_INDEX, k);
