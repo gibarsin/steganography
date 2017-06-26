@@ -30,6 +30,10 @@ Retrieve the secret as `secret.bmp` in your desktop folder using `k` shadows fro
 
     $ java -jar target/steganography.jar -r -secret ~/Desktop/secret4.bmp -k 14 -dir images/shadows/k_14_n_19
 
+## Sample shadows
+In the folder `images/shadows`, there are some folders containing sample shadows with the scheme used in the distribution phase.
+You can recover those secret images as an example of how the program works.
+
 ## Advice
 Note that this program was designed as a tool to distribute and retrieve secret files, without knowing exactly which should be the correct parameters 
 that were used during the distribution of the secret (in order to correctly retrieve it).
