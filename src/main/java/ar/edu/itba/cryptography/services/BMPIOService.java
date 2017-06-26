@@ -167,7 +167,7 @@ public class BMPIOService {
       // Choose only n paths from all the ones found
       for (int i = 0 ; i < n ; i++) {
         final Path path = paths.get(i);
-        IOService.print("Using shadow file: " + path);
+        // IOService.print("Using shadow file: " + path);
         map.put(path, createBmpData(path));
         inUsePaths.add(path);
       }
