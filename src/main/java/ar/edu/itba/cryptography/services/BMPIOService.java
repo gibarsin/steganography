@@ -44,12 +44,19 @@ public class BMPIOService {
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   public List<Path> openBmpFilesFrom(final Optional<String> optionalDir,
-      final Optional<Integer> optionalN, final OpenMode mode) {
+      final Optional<Integer> optionalN, final OpenMode mode,
+      final Path secretPath) {
     List<Path> paths;
     final String dir = optionalDir.orElse(CWD);
+    final Path fullSecretPath = secretPath == null ? null : Paths.get(dir, secretPath.toString());
     try (final Stream<Path> pathsStream = Files.walk(Paths.get(dir), MAX_DIR_DEPTH)) {
-      paths = pathsStream.filter(path -> Files.isRegularFile(path)
-          && bmpExtMatcher.matches(path)).collect(Collectors.toList());
+      paths = pathsStream.filter(path -> {
+        boolean rejected = false;
+        if (fullSecretPath != null) {
+          rejected = path.equals(fullSecretPath);
+        }
+        return Files.isRegularFile(path) && bmpExtMatcher.matches(path) && !rejected;
+      }).collect(Collectors.toList());
       paths = loadPathsBasedOn(mode, optionalN, paths);
     } catch (final IOException e) {
       exit(ExitStatus.COULD_NOT_OPEN_INPUT_FILE, e);

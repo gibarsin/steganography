@@ -14,7 +14,9 @@ import ar.edu.itba.cryptography.interfaces.DistributeAlgorithm;
 import ar.edu.itba.cryptography.interfaces.MainProgram;
 import ar.edu.itba.cryptography.services.BMPIOService;
 import ar.edu.itba.cryptography.services.IOService;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +55,7 @@ public class DistributeProgram implements MainProgram {
     }
     final Optional<String> dir = Optional.ofNullable(dirString);
     // n validation is performed inside the `bmpIOService.openBmpFilesFrom` method
-    final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, n, OUTPUT);
+    final List<Path> pathsToShadows = bmpIOService.openBmpFilesFrom(dir, n, OUTPUT, pathToInput);
     final int nShadows = pathsToShadows.size();
     if (nShadows > MAX_SHADOWS) {
       IOService.exit(VALIDATION_FAILED, "#shadows <= " + MAX_SHADOWS + ". #shadows = " + nShadows);
