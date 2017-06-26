@@ -29,6 +29,7 @@ public class BMPIOService {
     INPUT, OUTPUT
   }
   private static final String CWD = System.getProperty("user.dir");
+  private static final int MAX_DIR_DEPTH = 1;
   private static final int FIRST_ELEM_INDEX = 0;
   private static final String BMP_EXT = "glob:**.bmp";
   private static final PathMatcher bmpExtMatcher = FileSystems.getDefault().getPathMatcher(BMP_EXT);
@@ -46,7 +47,7 @@ public class BMPIOService {
       final Optional<Integer> optionalN, final OpenMode mode) {
     List<Path> paths;
     final String dir = optionalDir.orElse(CWD);
-    try (final Stream<Path> pathsStream = Files.walk(Paths.get(dir))) {
+    try (final Stream<Path> pathsStream = Files.walk(Paths.get(dir), MAX_DIR_DEPTH)) {
       paths = pathsStream.filter(path -> Files.isRegularFile(path)
           && bmpExtMatcher.matches(path)).collect(Collectors.toList());
       paths = loadPathsBasedOn(mode, optionalN, paths);
@@ -151,8 +152,8 @@ public class BMPIOService {
     if (optionalN.isPresent()) {
       final int n = optionalN.get();
       if (n > paths.size()) {
-        IOService.exit(VALIDATION_FAILED, "n is greater than the number of shadow images "
-            + "in the specified dir");
+        IOService.exit(VALIDATION_FAILED, "There are not enough shadow files in "
+            + "the specified directory");
         throw new IllegalStateException(); // Should never return from the above method
       }
       final List<Path> inUsePaths = new LinkedList<>();
