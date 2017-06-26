@@ -34,6 +34,9 @@ Retrieve the secret as `secret.bmp` in your desktop folder using `k` shadows fro
 In the folder `images/shadows`, there are some folders containing sample shadows with the scheme used in the distribution phase.
 You can recover those secret images as an example of how the program works.
 
+## Logs
+Detailed information of error problems & validations are specified int the logs files, located at the `logs` folder (it will be created after the first program run).
+
 ## Advice
 Note that this program was designed as a tool to distribute and retrieve secret files, without knowing exactly which should be the correct parameters 
 that were used during the distribution of the secret (in order to correctly retrieve it).
